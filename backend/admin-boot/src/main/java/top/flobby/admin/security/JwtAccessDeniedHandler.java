@@ -1,13 +1,11 @@
 package top.flobby.admin.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import top.flobby.admin.common.core.Result;
 
 import java.io.IOException;
 
@@ -17,7 +15,6 @@ import java.io.IOException;
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void handle(HttpServletRequest request,
@@ -27,7 +24,11 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
 
-        Result<Void> result = Result.error(403, "没有访问权限");
-        response.getWriter().write(objectMapper.writeValueAsString(result));
+        response.getWriter().write("""
+                {
+                "code": 403,
+                "message": "没有访问权限"
+                }
+                """);
     }
 }
