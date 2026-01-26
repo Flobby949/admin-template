@@ -32,6 +32,17 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Role',
         component: () => import('@/views/system/role/index.vue'),
         meta: { title: '角色管理', icon: 'User' }
+      },
+      {
+        path: 'menu',
+        name: 'Menu',
+        component: () => import('@/views/system/menu/index.vue'),
+        meta: {
+          title: '菜单管理',
+          icon: 'Menu',
+          requiresAuth: true,
+          roles: ['ADMIN']
+        }
       }
     ]
   },

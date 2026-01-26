@@ -24,6 +24,10 @@
               <el-icon><User /></el-icon>
               <span>角色管理</span>
             </el-menu-item>
+            <el-menu-item index="/system/menu">
+              <el-icon><Menu /></el-icon>
+              <span>菜单管理</span>
+            </el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>
