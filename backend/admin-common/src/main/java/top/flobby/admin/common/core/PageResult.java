@@ -18,7 +18,7 @@ public class PageResult<T> implements Serializable {
     /**
      * 数据列表
      */
-    private List<T> records;
+    private List<T> list;
 
     /**
      * 总记录数
@@ -43,8 +43,8 @@ public class PageResult<T> implements Serializable {
     public PageResult() {
     }
 
-    public PageResult(List<T> records, Long total, Long current, Long size) {
-        this.records = records;
+    public PageResult(List<T> list, Long total, Long current, Long size) {
+        this.list = list;
         this.total = total;
         this.current = current;
         this.size = size;
@@ -54,8 +54,8 @@ public class PageResult<T> implements Serializable {
     /**
      * 构建分页结果
      */
-    public static <T> PageResult<T> build(List<T> records, Long total, Long current, Long size) {
-        return new PageResult<>(records, total, current, size);
+    public static <T> PageResult<T> build(List<T> list, Long total, Long current, Long size) {
+        return new PageResult<>(list, total, current, size);
     }
 
     /**

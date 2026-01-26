@@ -7,10 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import top.flobby.admin.system.domain.entity.Menu;
 import top.flobby.admin.system.domain.entity.Role;
-import top.flobby.admin.system.domain.entity.User;
+import top.flobby.admin.system.domain.repository.MenuRepository;
 import top.flobby.admin.system.domain.repository.RoleRepository;
 import top.flobby.admin.system.domain.repository.UserRepository;
+import top.flobby.admin.system.domain.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MenuRepository menuRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,13 +41,25 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // 加载用户角色
         List<Role> roles = roleRepository.findByUserId(user.getId());
+        List<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toList());
 
-        // 转换为 Spring Security 的权限集合
-        // 注意：Spring Security 的 hasRole() 会自动添加 "ROLE_" 前缀
-        // 所以我们需要添加 "ROLE_" 前缀，或者使用 hasAuthority()
-        List<GrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleCode().toUpperCase()))
-                .collect(Collectors.toList());
+        // 构建权限集合
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        // 添加角色权限（ROLE_前缀）
+        roles.forEach(role ->
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleCode().toUpperCase()))
+        );
+
+        // 加载菜单权限
+        if (!roleIds.isEmpty()) {
+            List<Menu> menus = menuRepository.findByRoleIds(roleIds);
+            menus.stream()
+                    .filter(menu -> StringUtils.hasText(menu.getPermission()))
+                    .forEach(menu ->
+                        authorities.add(new SimpleGrantedAuthority(menu.getPermission()))
+                    );
+        }
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
