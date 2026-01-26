@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: admin-system
+  profiles:
+    active: dev
+  # JPA 配置
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+
+  # SQL 初始化
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: false
+
+  # Jackson 配置
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-DD HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# JWT 配置
+jwt:
+  secret: YWRtaW4tc3lzdGVtLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1zaWduaW5nLW11c3QtYmUtbG9uZy1lbm91Z2g=
+  expiration: 1800000  # 30分钟（毫秒）
+  refresh-expiration: 604800000  # 7天（毫秒）
+  header: Authorization
+  prefix: Bearer
+
+# 日志配置
+logging:
+  config: classpath:log/logback-spring.xml
+
+# 接口文档配置
+knife4j:
+  enable: false
+  setting:
+    language: zh_cn
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
