@@ -13,7 +13,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import top.flobby.admin.security.JwtAccessDeniedHandler;
+import top.flobby.admin.security.JwtAuthenticationEntryPoint;
 import top.flobby.admin.security.JwtAuthenticationFilter;
+import top.flobby.admin.security.SecurityConstants;
 
 /**
  * Spring Security 配置
@@ -24,9 +27,15 @@ import top.flobby.admin.security.JwtAuthenticationFilter;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
     /**
@@ -63,14 +72,15 @@ public class SecurityConfig {
 
                 // 授权配置
                 .authorizeHttpRequests(auth -> auth
-                        // 允许访问登录接口
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // 允许访问 API 文档
-                        .requestMatchers("/doc.html", "/webjars/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-                        // 允许访问健康检查
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        // 白名单路径允许匿名访问
+                        .requestMatchers(SecurityConstants.WHITE_LIST.toArray(new String[0])).permitAll()
                         // 其他请求需要认证
                         .anyRequest().authenticated())
+
+                // 异常处理
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
 
                 // 添加 JWT 过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
