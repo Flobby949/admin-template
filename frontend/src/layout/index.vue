@@ -11,24 +11,17 @@
           active-text-color="#ffd04b"
           router
         >
+          <!-- Dashboard 固定菜单 -->
           <el-menu-item index="/dashboard">
-            <el-icon><Menu /></el-icon>
+            <el-icon><HomeFilled /></el-icon>
             <span>Dashboard</span>
           </el-menu-item>
-          <el-sub-menu index="/system">
-            <template #title>
-              <el-icon><Setting /></el-icon>
-              <span>系统管理</span>
-            </template>
-            <el-menu-item index="/system/role">
-              <el-icon><User /></el-icon>
-              <span>角色管理</span>
-            </el-menu-item>
-            <el-menu-item index="/system/menu">
-              <el-icon><Menu /></el-icon>
-              <span>菜单管理</span>
-            </el-menu-item>
-          </el-sub-menu>
+          <!-- 动态菜单 -->
+          <sidebar-item
+            v-for="route in menuRoutes"
+            :key="route.path"
+            :item="route"
+          />
         </el-menu>
       </el-aside>
       <el-container>
@@ -50,13 +43,21 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
-import { Menu, Setting, User } from '@element-plus/icons-vue'
+import { usePermissionStore } from '@/stores/permission'
+import { HomeFilled } from '@element-plus/icons-vue'
+import SidebarItem from './components/SidebarItem.vue'
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const permissionStore = usePermissionStore()
 
 const activeMenu = computed(() => route.path)
+
+// 获取动态菜单路由（过滤掉隐藏的）
+const menuRoutes = computed(() => {
+  return permissionStore.dynamicRoutes.filter(route => !route.meta?.hidden)
+})
 
 const handleLogout = async () => {
   await userStore.logout()
