@@ -14,7 +14,8 @@ import top.flobby.admin.system.interfaces.dto.LoginDTO;
 import top.flobby.admin.system.interfaces.vo.LoginVO;
 import top.flobby.admin.system.interfaces.vo.UserInfoVO;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * 认证服务
@@ -27,6 +28,7 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final LoginLockService loginLockService;
     private final UserRepository userRepository;
+    private final PermissionCacheService permissionCacheService;
 
     /**
      * 登录
@@ -64,11 +66,24 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("用户不存在"));
 
-        // TODO: 获取真实角色
+        // 获取用户角色编码
+        Set<String> roleCodes = permissionCacheService.getUserRoleCodes(user.getId());
+
         return UserInfoVO.builder()
                 .name(user.getRealName() != null ? user.getRealName() : user.getUsername())
                 .avatar(user.getAvatar())
-                .roles(Collections.singletonList("admin"))
+                .roles(new ArrayList<>(roleCodes.isEmpty() ? Set.of("user") : roleCodes))
                 .build();
+    }
+
+    /**
+     * 获取当前用户权限列表
+     */
+    public Set<String> getCurrentUserPermissions() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("用户不存在"));
+
+        return permissionCacheService.getUserPermissions(user.getId());
     }
 }

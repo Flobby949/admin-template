@@ -57,7 +57,7 @@ management:
 # JWT 配置
 jwt:
   secret: YWRtaW4tc3lzdGVtLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1zaWduaW5nLW11c3QtYmUtbG9uZy1lbm91Z2g=
-  expiration: 1800000  # 30分钟（毫秒）
+  expiration: 18000000  # 300分钟（毫秒）
   refresh-expiration: 604800000  # 7天（毫秒）
   header: Authorization
   prefix: Bearer

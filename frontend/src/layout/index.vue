@@ -4,16 +4,31 @@
       <el-aside width="200px" class="aside-container">
         <div class="logo">Admin System</div>
         <el-menu
-          default-active="1"
+          :default-active="activeMenu"
           class="el-menu-vertical-demo"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"
+          router
         >
-          <el-menu-item index="1">
+          <el-menu-item index="/dashboard">
             <el-icon><Menu /></el-icon>
             <span>Dashboard</span>
           </el-menu-item>
+          <el-sub-menu index="/system">
+            <template #title>
+              <el-icon><Setting /></el-icon>
+              <span>系统管理</span>
+            </template>
+            <el-menu-item index="/system/role">
+              <el-icon><User /></el-icon>
+              <span>角色管理</span>
+            </el-menu-item>
+            <el-menu-item index="/system/menu">
+              <el-icon><Menu /></el-icon>
+              <span>菜单管理</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-container>
@@ -32,12 +47,16 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
-import { Menu } from '@element-plus/icons-vue'
+import { Menu, Setting, User } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
+
+const activeMenu = computed(() => route.path)
 
 const handleLogout = async () => {
   await userStore.logout()

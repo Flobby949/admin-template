@@ -21,6 +21,31 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/role',
+    meta: { title: '系统管理', icon: 'Setting' },
+    children: [
+      {
+        path: 'role',
+        name: 'Role',
+        component: () => import('@/views/system/role/index.vue'),
+        meta: { title: '角色管理', icon: 'User' }
+      },
+      {
+        path: 'menu',
+        name: 'Menu',
+        component: () => import('@/views/system/menu/index.vue'),
+        meta: {
+          title: '菜单管理',
+          icon: 'Menu',
+          requiresAuth: true,
+          roles: ['ADMIN']
+        }
+      }
+    ]
+  },
   // 404 page must be placed at the end !!!
   {
     path: '/:pathMatch(.*)*',
