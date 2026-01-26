@@ -1,27 +1,35 @@
 import { Directive, DirectiveBinding } from 'vue'
-import { useUserStore } from '@/stores/modules/user'
+import { usePermissionStore } from '@/stores/permission'
 
 /**
  * v-permission
- * Usage: <button v-permission="['admin', 'editor']">Delete</button>
+ * 支持两种用法：
+ * 1. 权限字符串: <button v-permission="'system:user:add'">Add</button>
+ * 2. 权限数组: <button v-permission="['system:user:add', 'system:user:edit']">Action</button>
  */
 export const permission: Directive = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
     const { value } = binding
-    const userStore = useUserStore()
-    const roles = userStore.roles
+    const permissionStore = usePermissionStore()
 
-    if (value && value instanceof Array && value.length > 0) {
-      const permissionRoles = value
-      const hasPermission = roles.some((role) => {
-        return permissionRoles.includes(role)
-      })
+    if (!value) {
+      return
+    }
 
-      if (!hasPermission) {
-        el.parentNode && el.parentNode.removeChild(el)
-      }
-    } else {
-      throw new Error(`need roles! Like v-permission="['admin','editor']"`)
+    // 将单个字符串转换为数组统一处理
+    const requiredPermissions = Array.isArray(value) ? value : [value]
+
+    if (requiredPermissions.length === 0) {
+      return
+    }
+
+    // 检查是否有任一权限
+    const hasPermission = requiredPermissions.some(permission => {
+      return permissionStore.hasPermission(permission)
+    })
+
+    if (!hasPermission) {
+      el.parentNode && el.parentNode.removeChild(el)
     }
   }
 }

@@ -45,13 +45,6 @@ const routes: Array<RouteRecordRaw> = [
         }
       }
     ]
-  },
-  // 404 page must be placed at the end !!!
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('@/views/dashboard/index.vue'), // Temporary placeholder or specific 404 page
-    meta: { hidden: true }
   }
 ]
 
@@ -59,5 +52,21 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+// 动态添加 404 路由的函数
+export function add404Route() {
+  router.addRoute({
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/error/404.vue'),
+        meta: { hidden: true }
+      }
+    ]
+  })
+}
 
 export default router

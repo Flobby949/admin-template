@@ -9,7 +9,10 @@ import top.flobby.admin.common.core.Result;
 import top.flobby.admin.system.application.AuthService;
 import top.flobby.admin.system.interfaces.dto.LoginDTO;
 import top.flobby.admin.system.interfaces.vo.LoginVO;
+import top.flobby.admin.system.interfaces.vo.RouterVO;
 import top.flobby.admin.system.interfaces.vo.UserInfoVO;
+
+import java.util.List;
 
 @Tag(name = "认证接口")
 @RestController
@@ -35,5 +38,11 @@ public class AuthController {
     @GetMapping("/info")
     public Result<UserInfoVO> getInfo() {
         return Result.success(authService.getUserInfo());
+    }
+
+    @Operation(summary = "获取用户路由")
+    @GetMapping("/routers")
+    public Result<List<RouterVO>> getRouters() {
+        return Result.success(authService.getUserRouters());
     }
 }

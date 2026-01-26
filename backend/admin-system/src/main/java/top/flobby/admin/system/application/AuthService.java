@@ -12,9 +12,11 @@ import top.flobby.admin.system.domain.entity.User;
 import top.flobby.admin.system.domain.repository.UserRepository;
 import top.flobby.admin.system.interfaces.dto.LoginDTO;
 import top.flobby.admin.system.interfaces.vo.LoginVO;
+import top.flobby.admin.system.interfaces.vo.RouterVO;
 import top.flobby.admin.system.interfaces.vo.UserInfoVO;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,6 +31,7 @@ public class AuthService {
     private final LoginLockService loginLockService;
     private final UserRepository userRepository;
     private final PermissionCacheService permissionCacheService;
+    private final MenuService menuService;
 
     /**
      * 登录
@@ -85,5 +88,20 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("用户不存在"));
 
         return permissionCacheService.getUserPermissions(user.getId());
+    }
+
+    /**
+     * 获取当前用户路由
+     * <p>
+     * 根据用户角色权限动态生成前端路由
+     *
+     * @return 路由列表
+     */
+    public List<RouterVO> getUserRouters() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("用户不存在"));
+
+        return menuService.buildRoutersByUserId(user.getId());
     }
 }

@@ -10,10 +10,9 @@ import top.flobby.admin.system.domain.repository.MenuRepository;
 import top.flobby.admin.system.infrastructure.repository.JpaRoleMenuRepository;
 import top.flobby.admin.system.interfaces.dto.MenuDTO;
 import top.flobby.admin.system.interfaces.vo.MenuTreeVO;
+import top.flobby.admin.system.interfaces.vo.RouterVO;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -265,5 +264,131 @@ public class MenuService {
                     return vo;
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 根据用户菜单ID列表构建动态路由
+     * <p>
+     * 将菜单数据转换为前端 Vue Router 格式，用于动态路由加载
+     * <p>
+     * 转换规则：
+     * - 目录类型(1)：component 为 Layout，有 children
+     * - 菜单类型(2)：component 为实际组件路径
+     * - 按钮类型(3)：不生成路由，仅作为权限标识
+     *
+     * @param menuIds 用户拥有的菜单ID列表
+     * @return 路由列表
+     */
+    public List<RouterVO> buildRoutersByMenuIds(Set<Long> menuIds) {
+        if (menuIds == null || menuIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 查询用户拥有的菜单（排除按钮类型，只保留目录和菜单）
+        List<Menu> menus = menuRepository.findAll().stream()
+                .filter(m -> menuIds.contains(m.getId()))
+                .filter(m -> m.getMenuType() != 3) // 排除按钮
+                .filter(m -> m.getStatus() == 1) // 只保留启用的
+                .collect(Collectors.toList());
+
+        return buildRouterTree(menus, 0L);
+    }
+
+    /**
+     * 根据用户ID构建动态路由
+     * <p>
+     * 查询用户拥有的所有菜单并转换为路由格式
+     *
+     * @param userId 用户ID
+     * @return 路由列表
+     */
+    public List<RouterVO> buildRoutersByUserId(Long userId) {
+        // 查询用户拥有的菜单ID
+        Set<Long> menuIds = jpaRoleMenuRepository.findMenuIdsByUserId(userId);
+        return buildRoutersByMenuIds(menuIds);
+    }
+
+    /**
+     * 递归构建路由树
+     *
+     * @param menus    菜单列表
+     * @param parentId 父菜单ID
+     * @return 路由树列表
+     */
+    private List<RouterVO> buildRouterTree(List<Menu> menus, Long parentId) {
+        return menus.stream()
+                .filter(m -> Objects.equals(m.getParentId(), parentId))
+                .sorted(Comparator.comparing(Menu::getSortOrder, Comparator.nullsLast(Integer::compareTo)))
+                .map(m -> {
+                    RouterVO router = new RouterVO();
+
+                    // 设置路由路径
+                    if (parentId == 0L) {
+                        // 顶级菜单，路径以 / 开头
+                        router.setPath(m.getRoutePath().startsWith("/") ? m.getRoutePath() : "/" + m.getRoutePath());
+                    } else {
+                        // 子菜单，相对路径
+                        router.setPath(m.getRoutePath());
+                    }
+
+                    // 设置路由名称（使用菜单名称的驼峰形式）
+                    router.setName(generateRouteName(m.getMenuName()));
+
+                    // 设置组件路径
+                    if (m.getMenuType() == 1) {
+                        // 目录类型使用 Layout
+                        router.setComponent("Layout");
+                    } else {
+                        // 菜单类型使用实际组件路径
+                        router.setComponent(m.getComponent());
+                    }
+
+                    // 设置元信息
+                    RouterVO.MetaVO meta = RouterVO.MetaVO.builder()
+                            .title(m.getMenuName())
+                            .icon(m.getIcon())
+                            .hidden(m.getVisible() == 0)
+                            .keepAlive(true)
+                            .build();
+
+                    // 如果有权限标识，添加到 meta
+                    if (StringUtils.hasText(m.getPermission())) {
+                        meta.setPermissions(Collections.singletonList(m.getPermission()));
+                    }
+
+                    router.setMeta(meta);
+
+                    // 递归构建子路由
+                    List<RouterVO> children = buildRouterTree(menus, m.getId());
+                    if (!children.isEmpty()) {
+                        router.setChildren(children);
+                        // 目录类型设置重定向到第一个子菜单
+                        if (m.getMenuType() == 1 && !children.isEmpty()) {
+                            String firstChildPath = children.get(0).getPath();
+                            router.setRedirect(router.getPath() + "/" + firstChildPath);
+                        }
+                    }
+
+                    return router;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 生成路由名称
+     * <p>
+     * 将中文菜单名称转换为英文路由名称
+     * 简单实现：使用菜单ID的哈希值作为唯一标识
+     *
+     * @param menuName 菜单名称
+     * @return 路由名称
+     */
+    private String generateRouteName(String menuName) {
+        // 简单实现：移除空格，首字母大写
+        if (menuName == null || menuName.isEmpty()) {
+            return "Route" + System.currentTimeMillis();
+        }
+        // 对于中文名称，使用拼音首字母或直接使用名称的哈希
+        return "Route" + Math.abs(menuName.hashCode());
     }
 }

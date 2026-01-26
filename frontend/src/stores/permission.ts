@@ -1,17 +1,24 @@
 import { defineStore } from 'pinia'
 import { getMenuTree, type MenuTreeVO } from '@/api/role'
+import { getRouters, type RouterVO } from '@/api/auth'
+import type { RouteRecordRaw } from 'vue-router'
 
 interface PermissionState {
   permissions: string[]
   menuTree: MenuTreeVO[]
-  routes: any[]
+  routes: RouteRecordRaw[]
+  dynamicRoutes: RouteRecordRaw[]
 }
+
+// 动态导入组件的模块映射
+const modules = import.meta.glob('@/views/**/*.vue')
 
 export const usePermissionStore = defineStore('permission', {
   state: (): PermissionState => ({
     permissions: [],
     menuTree: [],
-    routes: []
+    routes: [],
+    dynamicRoutes: []
   }),
 
   getters: {
@@ -51,22 +58,86 @@ export const usePermissionStore = defineStore('permission', {
       }
     },
 
-    // 生成路由
+    // 从后端加载动态路由
+    async loadRoutes(): Promise<RouteRecordRaw[]> {
+      try {
+        const res: any = await getRouters()
+        const routerData: RouterVO[] = res.data || []
+        const routes = this.convertToRoutes(routerData)
+        this.dynamicRoutes = routes
+        return routes
+      } catch (error) {
+        console.error('Failed to load routes:', error)
+        return []
+      }
+    },
+
+    // 将后端路由数据转换为 Vue Router 格式
+    convertToRoutes(routers: RouterVO[]): RouteRecordRaw[] {
+      return routers.map(router => {
+        const route = {
+          path: router.path,
+          name: router.name,
+          meta: {
+            title: router.meta?.title,
+            icon: router.meta?.icon,
+            hidden: router.meta?.hidden,
+            keepAlive: router.meta?.keepAlive,
+            permissions: router.meta?.permissions
+          },
+          component: this.loadComponent(router.component),
+          children: router.children ? this.convertToRoutes(router.children) : undefined
+        } as RouteRecordRaw
+
+        if (router.redirect) {
+          (route as any).redirect = router.redirect
+        }
+
+        return route
+      })
+    },
+
+    // 动态加载组件
+    loadComponent(component: string): any {
+      if (!component) return undefined
+
+      // Layout 组件特殊处理
+      if (component === 'Layout') {
+        return () => import('@/layout/index.vue')
+      }
+
+      // 动态加载 views 下的组件
+      const componentPath = `/src/views/${component}.vue`
+      if (modules[componentPath]) {
+        return modules[componentPath]
+      }
+
+      // 尝试添加 index.vue
+      const indexPath = `/src/views/${component}/index.vue`
+      if (modules[indexPath]) {
+        return modules[indexPath]
+      }
+
+      console.warn(`Component not found: ${component}`)
+      return undefined
+    },
+
+    // 生成路由（兼容旧方法）
     generateRoutes(menus: MenuTreeVO[]) {
       const routes = this.filterAsyncRoutes(menus)
       this.routes = routes
       return routes
     },
 
-    // 过滤异步路由
-    filterAsyncRoutes(menus: MenuTreeVO[]): any[] {
-      const routes: any[] = []
+    // 过滤异步路由（兼容旧方法）
+    filterAsyncRoutes(menus: MenuTreeVO[]): RouteRecordRaw[] {
+      const routes: RouteRecordRaw[] = []
 
       menus.forEach(menu => {
         // 只处理目录和菜单，不处理按钮
         if (menu.menuType === 3) return
 
-        const route: any = {
+        const route = {
           path: menu.routePath || '',
           name: menu.menuName,
           meta: {
@@ -74,22 +145,12 @@ export const usePermissionStore = defineStore('permission', {
             icon: menu.icon,
             permission: menu.permission,
             hidden: menu.visible === 0
-          }
-        }
-
-        // 设置组件
-        if (menu.component) {
-          if (menu.component === 'Layout') {
-            route.component = () => import('@/layout/index.vue')
-          } else {
-            route.component = () => import(`@/views/${menu.component}.vue`)
-          }
-        }
-
-        // 递归处理子菜单
-        if (menu.children && menu.children.length > 0) {
-          route.children = this.filterAsyncRoutes(menu.children)
-        }
+          },
+          component: menu.component ? this.loadComponent(menu.component) : undefined,
+          children: menu.children && menu.children.length > 0
+            ? this.filterAsyncRoutes(menu.children)
+            : undefined
+        } as RouteRecordRaw
 
         routes.push(route)
       })
@@ -102,6 +163,7 @@ export const usePermissionStore = defineStore('permission', {
       this.permissions = []
       this.menuTree = []
       this.routes = []
+      this.dynamicRoutes = []
     }
   }
 })
