@@ -1,5 +1,33 @@
 import request from '@/utils/request'
 
+/**
+ * 角色查询参数
+ */
+export interface RoleQuery {
+  roleName?: string
+  roleCode?: string
+  status?: number
+  pageNum?: number
+  pageSize?: number
+}
+
+/**
+ * 分页结果
+ */
+export interface PageResult<T> {
+  list: T[]
+  total: number
+}
+
+// 分页查询角色列表
+export function getRoleList(query: RoleQuery) {
+  return request<PageResult<RoleVO>>({
+    url: '/api/system/roles',
+    method: 'get',
+    params: query
+  })
+}
+
 // 角色列表
 export function listRoles() {
   return request({
@@ -88,6 +116,8 @@ export interface RoleForm {
 
 export interface RoleVO {
   id: number
+  name: string  // 改为 name 以匹配 UserVO.RoleInfo
+  code: string  // 改为 code 以匹配 UserVO.RoleInfo
   roleName: string
   roleCode: string
   dataScope: number

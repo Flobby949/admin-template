@@ -22,6 +22,15 @@
           :render-after-expand="false"
           clearable
           style="width: 100%"
+          @change="handleParentChange"
+        />
+        <el-alert
+          v-if="depthWarning"
+          :title="depthWarning"
+          type="warning"
+          :closable="false"
+          show-icon
+          style="margin-top: 8px"
         />
       </el-form-item>
 
@@ -44,17 +53,11 @@
 
       <!-- 目录和菜单类型显示图标 -->
       <el-form-item v-if="formData.menuType !== 3" label="图标" prop="icon">
-        <el-input
+        <IconSelect
           v-model="formData.icon"
-          placeholder="请输入图标名称（如：User, Setting）"
-          maxlength="100"
-        >
-          <template #prefix>
-            <el-icon v-if="formData.icon">
-              <component :is="formData.icon" />
-            </el-icon>
-          </template>
-        </el-input>
+          placeholder="请选择图标"
+          clearable
+        />
       </el-form-item>
 
       <!-- 菜单类型显示路由路径和组件路径 -->
@@ -137,9 +140,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { createMenu, getMenuById, updateMenu, type MenuDTO, type MenuTreeVO } from '@/api/menu'
+import IconSelect from '@/components/IconSelect/index.vue'
 
 // Props
 interface Props {
@@ -226,6 +230,48 @@ const formRules = computed<FormRules>(() => ({
 // 提交加载状态
 const submitLoading = ref(false)
 
+// 层级深度警告
+const depthWarning = ref('')
+
+// 最大层级深度
+const MAX_DEPTH = 3
+
+// 计算菜单深度
+const calculateMenuDepth = (parentId: number, menus: MenuTreeVO[]): number => {
+  if (parentId === 0) return 1
+
+  // 递归查找父菜单并计算深度
+  const findDepth = (id: number, menuList: MenuTreeVO[], currentDepth: number): number => {
+    for (const menu of menuList) {
+      if (menu.id === id) {
+        // 找到父菜单，继续向上查找
+        if (menu.parentId === 0) {
+          return currentDepth + 1
+        }
+        return findDepth(menu.parentId, props.menuTreeData, currentDepth + 1)
+      }
+      // 递归查找子菜单
+      if (menu.children && menu.children.length > 0) {
+        const depth = findDepth(id, menu.children, currentDepth)
+        if (depth > 0) return depth
+      }
+    }
+    return 0
+  }
+
+  return findDepth(parentId, menus, 1)
+}
+
+// 处理父菜单变更
+const handleParentChange = (parentId: number) => {
+  const depth = calculateMenuDepth(parentId, props.menuTreeData)
+  if (depth >= MAX_DEPTH) {
+    depthWarning.value = `当前选择的父菜单已达到第 ${depth - 1} 级，新增菜单将位于第 ${depth} 级。建议菜单层级不超过 ${MAX_DEPTH} 级。`
+  } else {
+    depthWarning.value = ''
+  }
+}
+
 // 监听菜单类型变化，清空相关字段
 watch(
   () => formData.menuType,
@@ -299,6 +345,7 @@ const resetForm = () => {
   formData.sortOrder = 0
   formData.visible = 1
   formData.status = 1
+  depthWarning.value = ''
   formRef.value?.clearValidate()
 }
 
