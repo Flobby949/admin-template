@@ -4,25 +4,25 @@
 -- BCrypt(12) 加密
 
 INSERT INTO sys_user (username, password, real_name, status, login_fail_count, deleted)
-VALUES ('admin', '$2a$12$sCtK6cA.yLeGtNuZJj9nWuIlOch1re04K3pc/Vc.CnNg7yEMjmP36', 'Administrator', 1, 0, 0)
+VALUES ('admin', '$2a$12$sCtK6cA.yLeGtNuZJj9nWuIlOch1re04K3pc/Vc.CnNg7yEMjmP36', 'Administrator', 1, 0, 0) AS new
 ON DUPLICATE KEY UPDATE
-    password = VALUES(password),
-    real_name = VALUES(real_name),
-    status = VALUES(status),
-    login_fail_count = VALUES(login_fail_count),
-    deleted = VALUES(deleted);
+    password = new.password,
+    real_name = new.real_name,
+    status = new.status,
+    login_fail_count = new.login_fail_count,
+    deleted = new.deleted;
 
 -- 初始角色数据
 INSERT INTO sys_role (id, role_name, role_code, data_scope, status, remark, deleted)
 VALUES
     (1, '超级管理员', 'admin', 1, 1, '拥有所有权限', 0),
-    (2, '普通用户', 'user', 4, 1, '普通用户角色', 0)
+    (2, '普通用户', 'user', 4, 1, '普通用户角色', 0) AS new
 ON DUPLICATE KEY UPDATE
-    role_name = VALUES(role_name),
-    data_scope = VALUES(data_scope),
-    status = VALUES(status),
-    remark = VALUES(remark),
-    deleted = VALUES(deleted);
+    role_name = new.role_name,
+    data_scope = new.data_scope,
+    status = new.status,
+    remark = new.remark,
+    deleted = new.deleted;
 
 -- 用户角色关联
 INSERT INTO sys_user_role (user_id, role_id)
