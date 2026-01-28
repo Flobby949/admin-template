@@ -70,11 +70,11 @@ CREATE TABLE IF NOT EXISTS sys_menu (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜单表';
 
 -- 部门表
-CREATE TABLE IF NOT EXISTS sys_dept (
+CREATE TABLE IF NOT EXISTS sys_department (
     id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '部门ID',
     parent_id BIGINT DEFAULT 0 COMMENT '父部门ID',
+    ancestors VARCHAR(500) COMMENT '祖级列表,格式: 0,1,2',
     dept_name VARCHAR(50) NOT NULL COMMENT '部门名称',
-    dept_level INT DEFAULT 1 COMMENT '部门层级',
     sort_order INT DEFAULT 0 COMMENT '排序',
     leader VARCHAR(50) COMMENT '负责人',
     phone VARCHAR(20) COMMENT '联系电话',
@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS sys_dept (
     deleted TINYINT DEFAULT 0 COMMENT '删除标记：0-未删除，1-已删除',
     tenant_id BIGINT COMMENT '租户ID（预留）',
     INDEX idx_parent_id (parent_id),
+    INDEX idx_ancestors (ancestors(100)),
     INDEX idx_status (status),
     INDEX idx_tenant (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='部门表';

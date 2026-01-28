@@ -1,10 +1,12 @@
 <template>
   <div class="operlog-container">
-    <el-card>
+    <el-card shadow="never">
       <template #header>
         <div class="card-header">
           <span>操作日志</span>
-          <el-button type="danger" @click="handleClear">清空日志</el-button>
+          <el-button type="danger" plain icon="Delete" @click="handleClean" v-permission="'monitor:operlog:remove'">
+            清空日志
+          </el-button>
         </div>
       </template>
 
@@ -26,8 +28,8 @@
             @keyup.enter="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="操作状态">
-          <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+        <el-form-item label="状态">
+          <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px">
             <el-option label="成功" :value="1" />
             <el-option label="失败" :value="0" />
           </el-select>
@@ -39,19 +41,30 @@
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
+            style="width: 240px"
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
-          <el-button type="success" @click="handleExport">导出</el-button>
+          <el-button type="primary" icon="Search" @click="handleQuery">查询</el-button>
+          <el-button icon="Refresh" @click="handleReset">重置</el-button>
+          <el-button type="warning" icon="Download" @click="handleExport" v-permission="'monitor:operlog:export'">
+            导出
+          </el-button>
         </el-form-item>
       </el-form>
 
       <!-- 数据表格 -->
-      <el-table :data="logList" border stripe>
-        <el-table-column type="index" label="序号" width="60" align="center" />
+      <el-table
+        v-loading="loading"
+        :data="logList"
+        @selection-change="handleSelectionChange"
+        border
+        stripe
+      >
+        <el-table-column type="selection" width="55" align="center" />
+        <el-table-column prop="id" label="日志编号" width="80" align="center" />
         <el-table-column prop="title" label="操作模块" width="150" show-overflow-tooltip />
         <el-table-column prop="businessType" label="业务类型" width="100" align="center">
           <template #default="{ row }">
@@ -60,11 +73,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="method" label="请求方法" width="200" show-overflow-tooltip />
         <el-table-column prop="requestMethod" label="请求方式" width="100" align="center" />
         <el-table-column prop="operName" label="操作人员" width="120" />
-        <el-table-column prop="operIp" label="操作IP" width="130" />
-        <el-table-column prop="operLocation" label="操作地点" width="120" />
+        <el-table-column prop="operIp" label="操作IP" width="130" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
@@ -72,10 +83,17 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="operTime" label="操作时间" width="180" />
+        <el-table-column prop="operTime" label="操作时间" width="180" align="center" />
+        <el-table-column prop="costTime" label="消耗时间" width="100" align="center">
+          <template #default="{ row }">
+            {{ row.costTime }}ms
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleDetail(row)">详情</el-button>
+            <el-button type="primary" link icon="View" @click="handleDetail(row)" v-permission="'monitor:operlog:query'">
+              详情
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -91,26 +109,45 @@
         @current-change="handleQuery"
       />
     </el-card>
+
+    <!-- 详情抽屉 -->
+    <log-detail v-model="dialog.visible" :data="dialog.data" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  getOperLogList,
+  cleanOperLog,
+  exportOperLog,
+  type OperLogQuery,
+  type OperLogVO
+} from '@/api/monitor/operlog'
+import LogDetail from './components/LogDetail.vue'
 
 // 查询参数
-const queryParams = reactive({
+const queryParams = reactive<OperLogQuery>({
   pageNum: 1,
   pageSize: 10,
-  title: '',
-  operName: '',
-  status: undefined as number | undefined,
+  title: undefined,
+  operName: undefined,
+  status: undefined,
   operTime: []
 })
 
-// 日志列表
-const logList = ref([])
+// 数据列表
+const loading = ref(false)
+const logList = ref<OperLogVO[]>([])
 const total = ref(0)
+const selectedIds = ref<number[]>([])
+
+// 详情控制
+const dialog = reactive({
+  visible: false,
+  data: {} as OperLogVO
+})
 
 // 业务类型映射
 const getBusinessTypeName = (type: number) => {
@@ -119,9 +156,12 @@ const getBusinessTypeName = (type: number) => {
     1: '新增',
     2: '修改',
     3: '删除',
-    4: '查询',
+    4: '授权',
     5: '导出',
-    6: '导入'
+    6: '导入',
+    7: '强退',
+    8: '生成代码',
+    9: '清空数据'
   }
   return typeMap[type] || '未知'
 }
@@ -133,52 +173,81 @@ const getBusinessTypeTag = (type: number) => {
     2: 'warning',
     3: 'danger',
     4: 'primary',
-    5: 'success',
-    6: 'warning'
+    5: 'warning',
+    6: 'warning',
+    7: 'danger',
+    8: 'info',
+    9: 'danger'
   }
   return tagMap[type] || 'info'
 }
 
 // 查询日志列表
-const handleQuery = () => {
-  // TODO: 调用 API 获取日志列表
-  console.log('查询操作日志', queryParams)
-  ElMessage.info('操作日志功能开发中...')
+const handleQuery = async () => {
+  loading.value = true
+  try {
+    const { data } = await getOperLogList(queryParams)
+    logList.value = data.list
+    total.value = data.total
+  } catch (error) {
+    ElMessage.error('查询操作日志失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 // 重置查询
 const handleReset = () => {
   queryParams.pageNum = 1
   queryParams.pageSize = 10
-  queryParams.title = ''
-  queryParams.operName = ''
+  queryParams.title = undefined
+  queryParams.operName = undefined
   queryParams.status = undefined
   queryParams.operTime = []
   handleQuery()
 }
 
-// 查看详情
-const handleDetail = (row: any) => {
-  console.log('查看日志详情', row)
-  ElMessage.info('查看详情功能开发中...')
+// 选中变化
+const handleSelectionChange = (selection: OperLogVO[]) => {
+  selectedIds.value = selection.map(item => item.id)
 }
 
-// 导出日志
-const handleExport = () => {
-  ElMessage.info('导出日志功能开发中...')
+// 查看详情
+const handleDetail = (row: OperLogVO) => {
+  dialog.data = row
+  dialog.visible = true
 }
 
 // 清空日志
-const handleClear = () => {
+const handleClean = () => {
   ElMessageBox.confirm('确认清空所有操作日志吗？', '警告', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    ElMessage.success('清空成功')
-  }).catch(() => {
-    ElMessage.info('已取消清空')
-  })
+  }).then(async () => {
+    try {
+      await cleanOperLog()
+      ElMessage.success('清空成功')
+      handleQuery()
+    } catch (error) {
+      ElMessage.error('清空失败')
+    }
+  }).catch(() => {})
+}
+
+// 导出日志
+const handleExport = async () => {
+  try {
+    const res = await exportOperLog(queryParams)
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = `operation_logs_${new Date().getTime()}.xlsx`
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  } catch (error) {
+    ElMessage.error('导出失败')
+  }
 }
 
 onMounted(() => {

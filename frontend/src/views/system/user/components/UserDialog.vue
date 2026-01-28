@@ -50,6 +50,19 @@
           <el-radio :label="0">禁用</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="归属部门" prop="deptIds">
+        <el-tree-select
+          v-model="form.deptIds"
+          :data="deptOptions"
+          :props="{ value: 'id', label: 'deptName', children: 'children' }"
+          value-key="id"
+          multiple
+          placeholder="请选择归属部门"
+          check-strictly
+          :render-after-expand="false"
+          style="width: 100%"
+        />
+      </el-form-item>
       <el-form-item label="角色" prop="roleIds">
         <el-select
           v-model="form.roleIds"
@@ -88,6 +101,7 @@ import { ref, reactive, watch, computed } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { getUserById, createUser, updateUser, type UserDTO } from '@/api/user'
 import { getRoleList, type RoleVO } from '@/api/role'
+import { getDeptTree, type DeptVO } from '@/api/system/dept'
 
 interface Props {
   modelValue: boolean
@@ -120,37 +134,30 @@ const form = reactive<UserDTO>({
   avatar: '',
   status: 1,
   roleIds: [],
+  deptIds: [], // Keep array if backend supports multiple, but usually user belongs to one main dept.
   remark: ''
 })
-
-// 表单校验规则
-const rules: FormRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 4, max: 50, message: '用户名长度必须在4-50个字符之间', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名只能包含字母、数字和下划线', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度必须在6-20个字符之间', trigger: 'blur' }
-  ],
-  realName: [
-    { required: true, message: '请输入姓名', trigger: 'blur' },
-    { max: 50, message: '姓名长度不能超过50个字符', trigger: 'blur' }
-  ],
-  email: [
-    { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
-  ],
-  phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
-  ],
-  status: [
-    { required: true, message: '请选择状态', trigger: 'change' }
-  ]
-}
+// Usually `deptId` (single) is better for primary department. 
+// However, UserDTO interface in `src/api/user.ts` has `deptIds?: number[]`.
+// Let's assume for now we select one department but store it in array or handle accordingly.
+// Wait, standard RBAC often has one Dept per user. 
+// Let's check `src/api/user.ts` again. It has `deptIds?: number[]`.
+// And `UserVO` has `depts?: DeptInfo[]`.
+// If the backend supports multiple departments, we should use multiple select. 
+// But the prompt says "Department Selection" and usually it's single in basic implementations.
+// Let's stick to the interface. I will add `deptId` to form if I need single select, or use `deptIds` for multiple.
+// Given `UserDTO` has `deptIds`, I'll use that. 
+// But typically users have one primary department. 
+// I will check standard implementations. 
+// If I use `deptIds`, I should use `multiple` in tree-select.
+// However, the `DeptTree` on the left implies a single hierarchy. 
+// I will assume single selection for simplicity and main organization structure, unless `deptIds` forces me.
+// Actually, I'll modify `form` to use `deptIds` as array for compatibility.
 
 // 角色列表
 const roleList = ref<RoleVO[]>([])
+// 部门列表
+const deptOptions = ref<DeptVO[]>([])
 
 // 提交状态
 const submitting = ref(false)
@@ -162,6 +169,16 @@ const loadRoleList = async () => {
     roleList.value = data.list
   } catch (error) {
     ElMessage.error('加载角色列表失败')
+  }
+}
+
+// 加载部门列表
+const loadDeptTree = async () => {
+  try {
+    const { data } = await getDeptTree()
+    deptOptions.value = data
+  } catch (error) {
+    ElMessage.error('加载部门列表失败')
   }
 }
 
@@ -178,6 +195,7 @@ const loadUserDetail = async () => {
     form.avatar = data.avatar || ''
     form.status = data.status
     form.roleIds = data.roles?.map(r => r.id) || []
+    form.deptIds = data.depts?.map(d => d.id) || []
     form.remark = data.remark || ''
   } catch (error) {
     ElMessage.error('加载用户详情失败')
@@ -195,6 +213,7 @@ const resetForm = () => {
   form.avatar = ''
   form.status = 1
   form.roleIds = []
+  form.deptIds = []
   form.remark = ''
   formRef.value?.resetFields()
 }
@@ -234,6 +253,7 @@ const handleClose = () => {
 watch(visible, (val) => {
   if (val) {
     loadRoleList()
+    loadDeptTree()
     if (isEdit.value) {
       loadUserDetail()
     }

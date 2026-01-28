@@ -51,8 +51,9 @@ const visibleChildren = computed(() => {
 })
 
 // 是否有可见的子菜单
+// 如果有子菜单（即使只有一个），也应该显示为子菜单结构
 const hasVisibleChildren = computed(() => {
-  return visibleChildren.value.length > 1
+  return visibleChildren.value.length >= 1
 })
 
 // 唯一的子菜单（当只有一个可见子菜单时）
