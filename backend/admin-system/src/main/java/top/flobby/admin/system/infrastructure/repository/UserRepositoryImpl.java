@@ -7,7 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+import top.flobby.admin.common.utils.DataScopeUtils;
 import top.flobby.admin.system.domain.entity.User;
+import top.flobby.admin.system.domain.entity.UserDept;
 import top.flobby.admin.system.domain.repository.UserRepository;
 import top.flobby.admin.system.interfaces.query.UserQuery;
 
@@ -94,6 +96,11 @@ public class UserRepositoryImpl implements UserRepository {
                 LocalDateTime endTime = LocalDateTime.parse(query.getEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createTime"), endTime));
             }
+
+            // 应用数据权限过滤
+            Predicate dataScopePredicate = DataScopeUtils.buildUserDataScopePredicate(
+                    root, criteriaBuilder, criteriaQuery, UserDept.class);
+            predicates.add(dataScopePredicate);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

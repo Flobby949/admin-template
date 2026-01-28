@@ -26,12 +26,7 @@
         />
       </el-form-item>
       <el-form-item label="数据权限" prop="dataScope">
-        <el-select v-model="formData.dataScope" placeholder="请选择数据权限">
-          <el-option label="全部数据" :value="1" />
-          <el-option label="本部门及下级" :value="2" />
-          <el-option label="仅本部门" :value="3" />
-          <el-option label="仅本人" :value="4" />
-        </el-select>
+        <DataScopeSelect v-model="formData.dataScope" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="formData.status">
@@ -77,6 +72,7 @@ import {
   type MenuTreeVO
 } from '@/api/role'
 import MenuTree from './MenuTree.vue'
+import DataScopeSelect from './DataScopeSelect.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -101,7 +97,7 @@ const menuTree = ref<MenuTreeVO[]>([])
 const formData = reactive<RoleForm>({
   roleName: '',
   roleCode: '',
-  dataScope: 1,
+  dataScope: 3, // 默认值改为"仅本部门"(3)，更安全
   status: 1,
   remark: '',
   menuIds: []
@@ -138,7 +134,7 @@ const rules: FormRules = {
 const resetForm = () => {
   formData.roleName = ''
   formData.roleCode = ''
-  formData.dataScope = 1
+  formData.dataScope = 3 // 默认值改为"仅本部门"(3)
   formData.status = 1
   formData.remark = ''
   formData.menuIds = []

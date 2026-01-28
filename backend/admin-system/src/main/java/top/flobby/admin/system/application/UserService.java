@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import top.flobby.admin.common.annotation.DataScope;
 import top.flobby.admin.common.core.PageResult;
 import top.flobby.admin.common.exception.BusinessException;
 import top.flobby.admin.system.domain.entity.User;
@@ -41,7 +42,10 @@ public class UserService {
 
     /**
      * 分页查询用户列表
+     * <p>
+     * 应用数据权限过滤，根据当前用户的数据权限范围返回可见的用户列表
      */
+    @DataScope
     public PageResult<UserVO> getUserList(UserQuery query) {
         // 构建分页参数
         Pageable pageable = PageRequest.of(
