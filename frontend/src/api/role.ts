@@ -22,7 +22,7 @@ export interface PageResult<T> {
 // 分页查询角色列表
 export function getRoleList(query: RoleQuery) {
   return request<PageResult<RoleVO>>({
-    url: '/api/system/roles',
+    url: '/system/roles',
     method: 'get',
     params: query
   })

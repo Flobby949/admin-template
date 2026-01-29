@@ -30,6 +30,14 @@ export function getRouters() {
   })
 }
 
+// 获取用户权限列表
+export function getPermissions() {
+  return request<string[]>({
+    url: 'auth/permissions',
+    method: 'get'
+  })
+}
+
 // 路由类型定义
 export interface RouterMeta {
   title: string

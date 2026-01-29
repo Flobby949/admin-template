@@ -88,3 +88,41 @@ ON DUPLICATE KEY UPDATE role_id = role_id;
 INSERT INTO sys_role_menu (role_id, menu_id)
 SELECT 2, id FROM sys_menu WHERE menu_type IN (1, 2) AND deleted = 0
 ON DUPLICATE KEY UPDATE role_id = role_id;
+
+-- 初始字典类型数据
+INSERT INTO sys_dict_type (id, dict_name, dict_type, status, remark, deleted)
+VALUES
+    (1, '用户状态', 'sys_user_status', 1, '用户状态列表', 0),
+    (2, '用户性别', 'sys_user_sex', 1, '用户性别列表', 0),
+    (3, '系统状态', 'sys_normal_disable', 1, '系统通用状态', 0),
+    (4, '是否', 'sys_yes_no', 1, '系统是否列表', 0)
+ON DUPLICATE KEY UPDATE
+    dict_name = VALUES(dict_name),
+    status = VALUES(status),
+    remark = VALUES(remark),
+    deleted = VALUES(deleted);
+
+-- 初始字典数据
+INSERT INTO sys_dict_data (dict_type, dict_label, dict_value, dict_sort, list_class, is_default, status, remark, deleted)
+VALUES
+    -- 用户状态
+    ('sys_user_status', '正常', '1', 1, 'success', 1, 1, '用户状态正常', 0),
+    ('sys_user_status', '停用', '0', 2, 'danger', 0, 1, '用户状态停用', 0),
+    -- 用户性别
+    ('sys_user_sex', '男', '1', 1, 'primary', 0, 1, '性别男', 0),
+    ('sys_user_sex', '女', '2', 2, 'danger', 0, 1, '性别女', 0),
+    ('sys_user_sex', '未知', '0', 3, 'info', 1, 1, '性别未知', 0),
+    -- 系统状态
+    ('sys_normal_disable', '正常', '1', 1, 'success', 1, 1, '正常状态', 0),
+    ('sys_normal_disable', '停用', '0', 2, 'danger', 0, 1, '停用状态', 0),
+    -- 是否
+    ('sys_yes_no', '是', 'Y', 1, 'success', 0, 1, '系统默认是', 0),
+    ('sys_yes_no', '否', 'N', 2, 'danger', 0, 1, '系统默认否', 0)
+ON DUPLICATE KEY UPDATE
+    dict_label = VALUES(dict_label),
+    dict_sort = VALUES(dict_sort),
+    list_class = VALUES(list_class),
+    is_default = VALUES(is_default),
+    status = VALUES(status),
+    remark = VALUES(remark),
+    deleted = VALUES(deleted);

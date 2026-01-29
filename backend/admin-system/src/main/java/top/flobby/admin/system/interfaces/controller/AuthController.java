@@ -13,6 +13,7 @@ import top.flobby.admin.system.interfaces.vo.RouterVO;
 import top.flobby.admin.system.interfaces.vo.UserInfoVO;
 
 import java.util.List;
+import java.util.Set;
 
 @Tag(name = "认证接口")
 @RestController
@@ -44,5 +45,11 @@ public class AuthController {
     @GetMapping("/routers")
     public Result<List<RouterVO>> getRouters() {
         return Result.success(authService.getUserRouters());
+    }
+
+    @Operation(summary = "获取用户权限列表")
+    @GetMapping("/permissions")
+    public Result<Set<String>> getPermissions() {
+        return Result.success(authService.getCurrentUserPermissions());
     }
 }

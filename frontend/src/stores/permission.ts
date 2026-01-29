@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { getMenuTree, type MenuTreeVO } from '@/api/role'
-import { getRouters, type RouterVO } from '@/api/auth'
+import { getRouters, getPermissions, type RouterVO } from '@/api/auth'
 import type { RouteRecordRaw } from 'vue-router'
 
 interface PermissionState {
@@ -61,8 +61,18 @@ export const usePermissionStore = defineStore('permission', {
     // 从后端加载动态路由
     async loadRoutes(): Promise<RouteRecordRaw[]> {
       try {
-        const res: any = await getRouters()
-        const routerData: RouterVO[] = res.data || []
+        // 并行加载路由和权限
+        const [routerRes, permissionRes] = await Promise.all([
+          getRouters(),
+          getPermissions()
+        ])
+
+        // 设置权限列表
+        const permissions: string[] = (permissionRes as any).data || []
+        this.permissions = permissions
+
+        // 转换路由
+        const routerData: RouterVO[] = (routerRes as any).data || []
         const routes = this.convertToRoutes(routerData)
         this.dynamicRoutes = routes
         return routes

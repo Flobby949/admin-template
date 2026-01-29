@@ -163,7 +163,8 @@ CREATE TABLE IF NOT EXISTS sys_dict_data (
     tenant_id BIGINT COMMENT '租户ID（预留）',
     INDEX idx_dict_type (dict_type),
     INDEX idx_status (status),
-    INDEX idx_tenant (tenant_id)
+    INDEX idx_tenant (tenant_id),
+    UNIQUE KEY uk_dict_type_value (dict_type, dict_value)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典数据表';
 
 -- 操作日志表

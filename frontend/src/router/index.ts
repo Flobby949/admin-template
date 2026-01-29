@@ -43,6 +43,18 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
           roles: ['ADMIN']
         }
+      },
+      {
+        path: 'dict',
+        name: 'Dict',
+        component: () => import('@/views/system/dict/index.vue'),
+        meta: { title: '字典管理', icon: 'Notebook' }
+      },
+      {
+        path: 'dict-data/:dictId(\\d+)',
+        name: 'DictData',
+        component: () => import('@/views/system/dict/data.vue'),
+        meta: { title: '字典数据', hidden: true, activeMenu: '/system/dict' }
       }
     ]
   }

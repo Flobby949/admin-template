@@ -47,7 +47,7 @@ public class UserController {
      */
     @Operation(summary = "根据ID获取用户详情")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:user:query')")
+    @PreAuthorize("hasAuthority('system:user:list')")
     public Result<UserVO> getById(@PathVariable Long id) {
         UserVO user = userService.getUserById(id);
         return Result.success(user);
