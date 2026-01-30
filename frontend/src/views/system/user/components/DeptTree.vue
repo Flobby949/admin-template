@@ -21,10 +21,16 @@
       highlight-current
       @node-click="handleNodeClick"
     >
-      <template #default="{ node }">
-        <span class="custom-tree-node">
-          <el-icon class="tree-icon" aria-hidden="true"><OfficeBuilding /></el-icon>
-          <span class="tree-label" :title="node.label">{{ node.label }}</span>
+      <template #default="{ node, data }">
+        <span class="custom-tree-node" :class="{ 'is-disabled': data.status === 0 }">
+          <el-icon class="tree-icon" aria-hidden="true">
+            <CircleClose v-if="data.status === 0" />
+            <OfficeBuilding v-else />
+          </el-icon>
+          <span class="tree-label" :title="node.label">
+            {{ node.label }}
+            <span v-if="data.status === 0" class="disabled-tag">(已停用)</span>
+          </span>
         </span>
       </template>
     </el-tree>
@@ -34,7 +40,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage, ElTree } from 'element-plus'
-import { OfficeBuilding } from '@element-plus/icons-vue'
+import { OfficeBuilding, CircleClose } from '@element-plus/icons-vue'
 import { getDeptTree, type DeptVO } from '@/api/system/dept'
 
 const emit = defineEmits<{
@@ -125,18 +131,32 @@ onMounted(() => {
   display: flex;
   align-items: center;
   width: 100%;
-  
+
   .tree-icon {
     margin-right: 8px;
     font-size: 16px;
     color: var(--el-text-color-secondary);
   }
-  
+
   .tree-label {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    .disabled-tag {
+      margin-left: 4px;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  }
+
+  &.is-disabled {
+    color: var(--el-text-color-placeholder);
+
+    .tree-icon {
+      color: var(--el-text-color-placeholder);
+    }
   }
 }
 </style>

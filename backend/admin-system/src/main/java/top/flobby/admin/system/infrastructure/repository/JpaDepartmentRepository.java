@@ -58,4 +58,16 @@ public interface JpaDepartmentRepository extends JpaRepository<Department, Long>
     @Query("UPDATE Department d SET d.ancestors = CONCAT(:newPrefix, SUBSTRING(d.ancestors, LENGTH(:oldPrefix) + 1)) " +
            "WHERE d.ancestors LIKE CONCAT(:oldPrefix, '%') AND d.deleted = 0")
     int updateAncestorsByPrefix(@Param("oldPrefix") String oldPrefix, @Param("newPrefix") String newPrefix);
+
+    /**
+     * 级联更新部门状态（包含所有子孙部门）
+     */
+    @Modifying
+    @Query("UPDATE Department d SET d.status = :status WHERE d.deleted = 0 AND (d.id = :id OR d.ancestors LIKE CONCAT(:prefix, '%'))")
+    int updateStatusCascade(@Param("id") Long id, @Param("prefix") String prefix, @Param("status") Integer status);
+
+    /**
+     * 统计指定部门列表中禁用部门的数量
+     */
+    long countByIdInAndStatusAndDeleted(List<Long> ids, Integer status, Integer deleted);
 }

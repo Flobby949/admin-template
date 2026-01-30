@@ -37,12 +37,7 @@ service.interceptors.response.use(
     // If the custom code is not 200, it is judged as an error.
     // Adjust this logic based on your actual backend response structure.
     if (res.code && res.code !== 200) {
-      ElMessage({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-
+      // 不在这里显示 ElMessage，由业务代码决定是否显示
       // 401: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 401 || res.code === 50012 || res.code === 50014) {
         // Handle logout or re-login logic here
@@ -56,11 +51,17 @@ service.interceptors.response.use(
   },
   (error: any) => {
     console.error('err' + error) // for debug
-    ElMessage({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+
+    // 提取后端返回的错误消息
+    let message = error.message
+    if (error.response && error.response.data && error.response.data.message) {
+      message = error.response.data.message
+    }
+
+    // 将错误消息附加到 error 对象上，供业务代码使用
+    error.message = message
+
+    // 不在这里显示 ElMessage，由业务代码决定是否显示
     return Promise.reject(error)
   }
 )

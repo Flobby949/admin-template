@@ -102,3 +102,14 @@ export function delDept(id: number) {
     method: 'delete'
   })
 }
+
+/**
+ * Update Department Status
+ */
+export function changeDeptStatus(id: number, status: number) {
+  return request<void>({
+    url: `/system/departments/${id}/status`,
+    method: 'patch',
+    params: { status }
+  })
+}

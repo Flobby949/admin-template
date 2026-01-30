@@ -58,6 +58,13 @@ public class AuthService {
             // 记录登录失败
             loginLockService.recordFail(username);
             throw new BusinessException("用户名或密码错误");
+        } catch (Exception e) {
+            // 处理其他认证异常（如部门禁用、账号禁用等）
+            String message = e.getMessage();
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                message = e.getCause().getMessage();
+            }
+            throw new BusinessException(message != null ? message : "登录失败");
         }
     }
 

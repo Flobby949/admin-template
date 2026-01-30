@@ -70,4 +70,15 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     public int updateAncestorsByPrefix(String oldPrefix, String newPrefix) {
         return jpaDepartmentRepository.updateAncestorsByPrefix(oldPrefix, newPrefix);
     }
+
+    @Override
+    @Transactional
+    public int updateStatusCascade(Long id, String prefix, Integer status) {
+        return jpaDepartmentRepository.updateStatusCascade(id, prefix, status);
+    }
+
+    @Override
+    public long countByIdInAndStatusAndDeleted(List<Long> ids, Integer status, Integer deleted) {
+        return jpaDepartmentRepository.countByIdInAndStatusAndDeleted(ids, status, deleted);
+    }
 }

@@ -41,14 +41,19 @@
         stripe
         default-expand-all
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :row-style="tableRowStyle"
       >
         <el-table-column prop="deptName" label="部门名称" width="260" />
         <el-table-column prop="sortOrder" label="排序" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '正常' : '停用' }}
-            </el-tag>
+            <el-switch
+              v-model="row.status"
+              :active-value="1"
+              :inactive-value="0"
+              @change="handleStatusChange(row)"
+              v-permission="'system:dept:edit'"
+            />
           </template>
         </el-table-column>
         <el-table-column prop="leader" label="负责人" width="120" align="center" />
@@ -86,7 +91,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getDeptTree, delDept, type DeptVO, type DeptQuery } from '@/api/system/dept'
+import { getDeptTree, delDept, changeDeptStatus, type DeptVO, type DeptQuery } from '@/api/system/dept'
 import DeptDialog from './components/DeptDialog.vue'
 
 // 查询参数
@@ -160,6 +165,43 @@ const handleDelete = (row: DeptVO) => {
       ElMessage.error('删除失败')
     }
   }).catch(() => {})
+}
+
+// 修改部门状态
+const handleStatusChange = async (row: DeptVO) => {
+  const text = row.status === 0 ? '停用' : '启用'
+  const hasChildren = row.children && row.children.length > 0
+  
+  try {
+    if (row.status === 0) {
+      const warningMsg = hasChildren 
+        ? `该部门包含子部门，停用将导致所有子部门及关联用户无法访问，是否确认？`
+        : `确认要"${text}""${row.deptName}"吗？`
+        
+      await ElMessageBox.confirm(warningMsg, '系统提示', { 
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning' 
+      })
+    }
+    
+    await changeDeptStatus(row.id, row.status)
+    ElMessage.success(`${text}成功`)
+    handleQuery()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(`${text}失败`)
+    }
+    row.status = row.status === 0 ? 1 : 0
+  }
+}
+
+// 禁用行样式
+const tableRowStyle = ({ row }: { row: DeptVO }) => {
+  if (row.status === 0) {
+    return { color: '#a8abb2' }
+  }
+  return {}
 }
 
 onMounted(() => {

@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.flobby.admin.system.domain.entity.Menu;
 import top.flobby.admin.system.domain.entity.Role;
+import top.flobby.admin.system.domain.entity.UserDept;
 import top.flobby.admin.system.domain.repository.MenuRepository;
 import top.flobby.admin.system.domain.repository.RoleRepository;
 import top.flobby.admin.system.domain.repository.UserRepository;
 import top.flobby.admin.system.domain.entity.User;
+import top.flobby.admin.system.infrastructure.repository.JpaDepartmentRepository;
+import top.flobby.admin.system.infrastructure.repository.JpaUserDeptRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MenuRepository menuRepository;
+    private final JpaUserDeptRepository jpaUserDeptRepository;
+    private final JpaDepartmentRepository jpaDepartmentRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,6 +42,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         if (user.getStatus() == 0) {
             throw new RuntimeException("账号已禁用");
+        }
+
+        // 检查用户关联的部门状态
+        List<UserDept> userDepts = jpaUserDeptRepository.findByUserId(user.getId());
+        if (!userDepts.isEmpty()) {
+            List<Long> deptIds = userDepts.stream()
+                    .map(UserDept::getDeptId)
+                    .collect(Collectors.toList());
+
+            // 检查是否有禁用部门（任一部门禁用则拒绝登录）
+            long disabledCount = jpaDepartmentRepository.countByIdInAndStatusAndDeleted(deptIds, 0, 0);
+            if (disabledCount > 0) {
+                throw new RuntimeException("所属部门已禁用");
+            }
         }
 
         // 加载用户角色

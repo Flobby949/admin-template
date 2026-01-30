@@ -212,13 +212,39 @@ public class DepartmentService {
      */
     @Transactional
     public void updateDepartmentStatus(Long id, Integer status) {
+        // 校验状态值
+        if (status != 0 && status != 1) {
+            throw new BusinessException("状态值只能是0（禁用）或1（启用）");
+        }
+
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("部门不存在"));
 
-        department.setStatus(status);
-        departmentRepository.save(department);
+        if (status == 0) {
+            // 禁用操作：级联禁用所有子孙部门
+            String ancestorsPrefix = calculateDescendantsPrefix(department);
+            int updatedCount = departmentRepository.updateStatusCascade(id, ancestorsPrefix, 0);
+            log.info("级联禁用部门成功: id={}, 影响部门数={}", id, updatedCount);
+        } else {
+            // 启用操作：仅启用当前部门（不级联）
+            department.setStatus(status);
+            departmentRepository.save(department);
+            log.info("启用部门成功: id={}", id);
+        }
+    }
 
-        log.info("更新部门状态成功: id={}, status={}", id, status);
+    /**
+     * 计算子孙部门查询前缀
+     *
+     * @param department 部门
+     * @return 子孙部门前缀
+     */
+    private String calculateDescendantsPrefix(Department department) {
+        String ancestors = department.getAncestors();
+        if (ancestors == null || ancestors.isEmpty()) {
+            return String.valueOf(department.getId());
+        }
+        return ancestors + "," + department.getId();
     }
 
     /**

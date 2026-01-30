@@ -93,4 +93,24 @@ public interface DepartmentRepository {
      * @return 更新的记录数
      */
     int updateAncestorsByPrefix(String oldPrefix, String newPrefix);
+
+    /**
+     * 级联更新部门状态（包含所有子孙部门）
+     *
+     * @param id     部门ID
+     * @param prefix 祖级路径前缀
+     * @param status 状态
+     * @return 更新的记录数
+     */
+    int updateStatusCascade(Long id, String prefix, Integer status);
+
+    /**
+     * 统计指定部门列表中禁用部门的数量
+     *
+     * @param ids    部门ID列表
+     * @param status 状态
+     * @param deleted 删除标记
+     * @return 禁用部门数量
+     */
+    long countByIdInAndStatusAndDeleted(List<Long> ids, Integer status, Integer deleted);
 }
