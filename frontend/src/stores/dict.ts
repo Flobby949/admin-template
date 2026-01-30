@@ -14,11 +14,7 @@ export const useDictStore = defineStore('dict', {
       if (!this.dict.has(dictType)) {
         try {
           const res = await getDicts(dictType)
-          this.dict.set(dictType, res || []) // Assume res is the array directly or res.data, checked api definition, it returns Promise<DictDataVO[]> which usually means request<T> returns T directly or Response<T>.
-          // Looking at request.ts, `service.interceptors.response.use` returns `res.data` (if code is 200). 
-          // Wait, `request<T>` in `frontend/src/api/role.ts` returns `Promise<T>`. 
-          // `getDicts` returns `request<DictDataVO[]>`. 
-          // So `res` is `DictDataVO[]`.
+          this.dict.set(dictType, res || [])
         } catch (error) {
           console.error(`Get dict ${dictType} failed:`, error)
           return []

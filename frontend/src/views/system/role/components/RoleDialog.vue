@@ -147,12 +147,11 @@ const handleOpen = async () => {
   try {
     // 加载菜单树
     const menuRes: any = await getMenuTree()
-    menuTree.value = menuRes.data || []
+    menuTree.value = menuRes || []
 
     // 如果是编辑，加载角色数据
     if (props.roleId) {
-      const roleRes: any = await getRole(props.roleId)
-      const role = roleRes.data
+      const role: any = await getRole(props.roleId)
       formData.roleName = role.roleName
       formData.roleCode = role.roleCode
       formData.dataScope = role.dataScope

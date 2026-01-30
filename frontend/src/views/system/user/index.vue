@@ -269,7 +269,7 @@ const passwordRules: FormRules = {
 const handleQuery = async () => {
   loading.value = true
   try {
-    const { data } = await getUserList(queryForm)
+    const data = await getUserList(queryForm)
     userList.value = data.list
     total.value = data.total
   } catch (error) {

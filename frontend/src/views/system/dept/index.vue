@@ -111,7 +111,7 @@ const dialog = reactive({
 const handleQuery = async () => {
   loading.value = true
   try {
-    const { data } = await getDeptTree(queryParams)
+    const data = await getDeptTree(queryParams)
     deptList.value = data
   } catch (error) {
     ElMessage.error('查询部门列表失败')

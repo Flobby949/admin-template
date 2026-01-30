@@ -38,7 +38,7 @@ const treeRef = ref<InstanceType<typeof ElTree>>()
 // Fetch Dept Tree
 const getTreeselect = async () => {
   try {
-    const { data } = await getDeptTree()
+    const data = await getDeptTree()
     deptOptions.value = data
   } catch (error) {
     ElMessage.error('获取部门列表失败')

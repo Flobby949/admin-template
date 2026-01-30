@@ -133,7 +133,7 @@ const fetchRoleList = async () => {
   loading.value = true
   try {
     const res: any = await listRoles()
-    let list = res.data || []
+    let list = res || []
 
     // 前端过滤
     if (queryParams.roleName) {

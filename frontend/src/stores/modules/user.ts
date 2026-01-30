@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', {
       // but the code below assumes a working backend or at least the API call structure.
       try {
         const res: any = await login({ username: username.trim(), password })
-        const token = res.data?.token || 'mock-token' // Fallback for dev without backend
+        const token = res?.token || 'mock-token' // Fallback for dev without backend
         this.token = token
         setToken(token)
         return res
@@ -32,14 +32,14 @@ export const useUserStore = defineStore('user', {
     async getInfo() {
       try {
         const res: any = await getInfo()
-        const { roles, name, avatar } = res.data
+        const { roles, name, avatar } = res
         if (!roles || roles.length <= 0) {
           throw new Error('getInfo: roles must be a non-null array!')
         }
         this.roles = roles
         this.name = name
         this.avatar = avatar
-        return res.data
+        return res
       } catch (error) {
         return Promise.reject(error)
       }

@@ -165,8 +165,8 @@ const submitting = ref(false)
 // 加载角色列表
 const loadRoleList = async () => {
   try {
-    const { data } = await getRoleList({ pageNum: 1, pageSize: 100 })
-    roleList.value = data.list
+    const data = await getRoleList({ pageNum: 1, pageSize: 100 })
+    roleList.value = Array.isArray(data) ? data : (data.list || [])
   } catch (error) {
     ElMessage.error('加载角色列表失败')
   }
@@ -175,7 +175,7 @@ const loadRoleList = async () => {
 // 加载部门列表
 const loadDeptTree = async () => {
   try {
-    const { data } = await getDeptTree()
+    const data = await getDeptTree()
     deptOptions.value = data
   } catch (error) {
     ElMessage.error('加载部门列表失败')
@@ -186,7 +186,7 @@ const loadDeptTree = async () => {
 const loadUserDetail = async () => {
   if (!props.userId) return
   try {
-    const { data } = await getUserById(props.userId)
+    const data = await getUserById(props.userId)
     form.id = data.id
     form.username = data.username
     form.realName = data.realName || ''
@@ -225,11 +225,17 @@ const handleSubmit = async () => {
     if (valid) {
       submitting.value = true
       try {
+        // 构建提交数据，编辑模式下如果密码为空则不发送
+        const submitData = { ...form }
+        if (isEdit.value && !submitData.password) {
+          delete submitData.password
+        }
+
         if (isEdit.value) {
-          await updateUser(props.userId!, form)
+          await updateUser(props.userId!, submitData)
           ElMessage.success('更新成功')
         } else {
-          await createUser(form)
+          await createUser(submitData)
           ElMessage.success('创建成功')
         }
         emit('success')

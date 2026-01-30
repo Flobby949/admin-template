@@ -126,7 +126,7 @@ watch(() => props.modelValue, async (val) => {
 // Get Dept Tree for Select
 const getTreeselect = async () => {
   try {
-    const { data } = await getDeptTree()
+    const data = await getDeptTree()
     deptOptions.value = [{ id: 0, deptName: '顶级部门', children: [] } as any].concat(data)
     
     // If editing, disable current node and children to prevent cycle
@@ -164,7 +164,7 @@ const disableChildren = (children: any[]) => {
 // Load dept details
 const loadDept = async (id: number) => {
   try {
-    const { data } = await getDept(id)
+    const data = await getDept(id)
     Object.assign(form, data)
   } catch (error) {
     ElMessage.error('获取部门详情失败')

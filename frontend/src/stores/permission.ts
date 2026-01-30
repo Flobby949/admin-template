@@ -50,7 +50,7 @@ export const usePermissionStore = defineStore('permission', {
     async loadMenuTree() {
       try {
         const res: any = await getMenuTree()
-        this.menuTree = res.data || []
+        this.menuTree = res || []
         return this.menuTree
       } catch (error) {
         console.error('Failed to load menu tree:', error)
@@ -67,13 +67,19 @@ export const usePermissionStore = defineStore('permission', {
           getPermissions()
         ])
 
+        console.log('=== Debug loadRoutes ===')
+        console.log('routerRes:', routerRes)
+        console.log('permissionRes:', permissionRes)
+
         // 设置权限列表
-        const permissions: string[] = (permissionRes as any).data || []
+        const permissions: string[] = (permissionRes as any) || []
         this.permissions = permissions
 
         // 转换路由
-        const routerData: RouterVO[] = (routerRes as any).data || []
+        const routerData: RouterVO[] = (routerRes as any) || []
+        console.log('routerData:', routerData)
         const routes = this.convertToRoutes(routerData)
+        console.log('converted routes:', routes)
         this.dynamicRoutes = routes
         return routes
       } catch (error) {

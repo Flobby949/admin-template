@@ -166,7 +166,7 @@ const fetchMenuList = async () => {
   loading.value = true
   try {
     const res: any = await listMenuTree()
-    menuList.value = res.data || []
+    menuList.value = res || []
   } catch (error) {
     console.error('Failed to fetch menu list:', error)
     ElMessage.error('获取菜单列表失败')

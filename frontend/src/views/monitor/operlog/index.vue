@@ -186,7 +186,7 @@ const getBusinessTypeTag = (type: number) => {
 const handleQuery = async () => {
   loading.value = true
   try {
-    const { data } = await getOperLogList(queryParams)
+    const data = await getOperLogList(queryParams)
     logList.value = data.list
     total.value = data.total
   } catch (error) {

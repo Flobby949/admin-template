@@ -14,7 +14,7 @@
         全选/全不选
       </el-checkbox>
       <el-checkbox v-model="checkStrictly">
-        父子联动
+        联动子节点
       </el-checkbox>
     </div>
     <el-tree
@@ -24,7 +24,7 @@
       show-checkbox
       node-key="id"
       :default-expand-all="expandAll"
-      :check-strictly="!checkStrictly"
+      check-strictly
       :default-checked-keys="modelValue"
       @check="handleCheck"
     >
@@ -190,18 +190,67 @@ const getAllKeys = (tree: MenuTreeVO[]): number[] => {
   return keys
 }
 
-// 选中变化
-const handleCheck = () => {
-  const checkedKeys = treeRef.value?.getCheckedKeys(false) as number[]
-  const halfCheckedKeys = treeRef.value?.getHalfCheckedKeys() as number[]
-  emit('update:modelValue', [...checkedKeys, ...halfCheckedKeys])
+// 获取节点的所有子节点ID
+const getChildKeys = (node: MenuTreeVO): number[] => {
+  const keys: number[] = []
+  const traverse = (children: MenuTreeVO[] | undefined) => {
+    if (!children) return
+    children.forEach(child => {
+      keys.push(child.id)
+      traverse(child.children)
+    })
+  }
+  traverse(node.children)
+  return keys
+}
+
+// 根据ID查找节点
+const findNodeById = (tree: MenuTreeVO[], id: number): MenuTreeVO | null => {
+  for (const node of tree) {
+    if (node.id === id) return node
+    if (node.children) {
+      const found = findNodeById(node.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+// 选中变化 - 实现只向下联动子节点
+const handleCheck = (data: MenuTreeVO, { checkedKeys }: { checkedKeys: number[] }) => {
+  if (!checkStrictly.value) {
+    // 不联动模式，直接更新
+    emit('update:modelValue', checkedKeys)
+    return
+  }
+
+  // 联动模式：只向下联动子节点
+  const node = findNodeById(props.menuTree, data.id)
+  if (!node) {
+    emit('update:modelValue', checkedKeys)
+    return
+  }
+
+  const childKeys = getChildKeys(node)
+  const isChecked = checkedKeys.includes(data.id)
+
+  let newCheckedKeys: number[]
+  if (isChecked) {
+    // 选中时，同时选中所有子节点
+    newCheckedKeys = [...new Set([...checkedKeys, ...childKeys])]
+  } else {
+    // 取消选中时，同时取消所有子节点
+    const childKeySet = new Set(childKeys)
+    newCheckedKeys = checkedKeys.filter(key => !childKeySet.has(key))
+  }
+
+  treeRef.value?.setCheckedKeys(newCheckedKeys)
+  emit('update:modelValue', newCheckedKeys)
 }
 
 // 获取选中的节点ID
 const getCheckedKeys = () => {
-  const checkedKeys = treeRef.value?.getCheckedKeys(false) as number[]
-  const halfCheckedKeys = treeRef.value?.getHalfCheckedKeys() as number[]
-  return [...checkedKeys, ...halfCheckedKeys]
+  return treeRef.value?.getCheckedKeys(false) as number[]
 }
 
 // 设置选中的节点

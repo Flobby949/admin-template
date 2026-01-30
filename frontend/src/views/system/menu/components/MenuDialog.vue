@@ -313,8 +313,7 @@ const fetchMenuData = async () => {
   if (!props.menuId) return
 
   try {
-    const res: any = await getMenuById(props.menuId)
-    const menu = res.data
+    const menu: any = await getMenuById(props.menuId)
 
     // 填充表单数据
     formData.parentId = menu.parentId
