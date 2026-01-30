@@ -7,7 +7,7 @@ export interface DeptVO {
   id: number
   parentId: number
   deptName: string
-  orderNum: number
+  sortOrder: number
   leader: string
   phone: string
   email: string
@@ -24,7 +24,7 @@ export interface DeptForm {
   id?: number
   parentId?: number
   deptName: string
-  orderNum: number
+  sortOrder: number
   leader?: string
   phone?: string
   email?: string

@@ -50,8 +50,8 @@
         <el-table-column prop="dictSort" label="字典排序" align="center" sortable />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
-              {{ row.status === '1' ? '正常' : '停用' }}
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+              {{ row.status === 1 ? '正常' : '停用' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -114,8 +114,8 @@
           </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="form.status">
-              <el-radio value="1">正常</el-radio>
-              <el-radio value="0">停用</el-radio>
+              <el-radio :value="1">正常</el-radio>
+              <el-radio :value="0">停用</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="备注" prop="remark">
@@ -167,15 +167,15 @@ const listClassOptions = [
 
 const data = reactive({
   form: {
-    dictCode: undefined,
+    id: undefined,
     dictLabel: '',
     dictValue: '',
     dictSort: 0,
     dictType: '',
     cssClass: '',
     listClass: 'default',
-    isDefault: 'N',
-    status: '1',
+    isDefault: 0,
+    status: 1,
     remark: ''
   } as Partial<DictDataVO>,
   queryParams: {
@@ -238,7 +238,7 @@ function handleAdd() {
 /** 编辑按钮操作 */
 function handleEdit(row: DictDataVO) {
   reset()
-  getData(row.dictCode).then(response => {
+  getData(row.id).then(response => {
     form.value = response
     open.value = true
     title.value = '修改字典数据'
@@ -249,7 +249,7 @@ function handleEdit(row: DictDataVO) {
 function submitForm() {
   dictFormRef.value?.validate(valid => {
     if (valid) {
-      if (form.value.dictCode !== undefined) {
+      if (form.value.id !== undefined) {
         updateData(form.value).then(() => {
           dictStore.removeDict(form.value.dictType!)
           ElMessage.success('修改成功')
@@ -275,7 +275,7 @@ function handleDelete(row: DictDataVO) {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    return delData(row.dictCode)
+    return delData(row.id)
   }).then(() => {
     dictStore.removeDict(row.dictType)
     handleQuery()
@@ -297,15 +297,15 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    dictCode: undefined,
+    id: undefined,
     dictLabel: '',
     dictValue: '',
     dictSort: 0,
     dictType: currentDictType.value?.dictType || '',
     cssClass: '',
     listClass: 'default',
-    isDefault: 'N',
-    status: '1',
+    isDefault: 0,
+    status: 1,
     remark: ''
   }
 }

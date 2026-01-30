@@ -43,7 +43,7 @@
         :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
         <el-table-column prop="deptName" label="部门名称" width="260" />
-        <el-table-column prop="orderNum" label="排序" width="100" align="center" />
+        <el-table-column prop="sortOrder" label="排序" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">

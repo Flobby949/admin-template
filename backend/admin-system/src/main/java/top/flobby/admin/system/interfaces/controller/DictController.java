@@ -45,7 +45,7 @@ public class DictController {
 
     @Operation(summary = "获取字典类型详情")
     @GetMapping("/types/{id}")
-    @RequiresPermission("system:dict:query")
+    @RequiresPermission("system:dict:list")
     public Result<DictTypeVO> getType(
             @Parameter(description = "字典类型ID") @PathVariable("id") Long id) {
         DictTypeVO dictType = dictService.getDictType(id);
@@ -100,7 +100,7 @@ public class DictController {
 
     @Operation(summary = "获取字典数据详情")
     @GetMapping("/data/{id}")
-    @RequiresPermission("system:dict:query")
+    @RequiresPermission("system:dict:list")
     public Result<DictDataVO> getData(
             @Parameter(description = "字典数据ID") @PathVariable("id") Long id) {
         DictDataVO dictData = dictService.getDictData(id);

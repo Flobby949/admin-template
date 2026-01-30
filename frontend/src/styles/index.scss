@@ -103,7 +103,7 @@ html.dark {
    ============================================ */
 
 /* Primary Button */
-.el-button--primary {
+.el-button--primary:not(.is-link) {
   --el-button-bg-color: var(--primary-color);
   --el-button-border-color: var(--primary-color);
   --el-button-hover-bg-color: var(--primary-hover);

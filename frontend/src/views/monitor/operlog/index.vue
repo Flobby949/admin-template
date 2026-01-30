@@ -62,10 +62,11 @@
         @selection-change="handleSelectionChange"
         border
         stripe
+        style="width: 100%"
       >
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column prop="id" label="日志编号" width="80" align="center" />
-        <el-table-column prop="title" label="操作模块" width="150" show-overflow-tooltip />
+        <el-table-column prop="title" label="操作模块" min-width="150" show-overflow-tooltip />
         <el-table-column prop="businessType" label="业务类型" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="getBusinessTypeTag(row.businessType)">
@@ -74,8 +75,8 @@
           </template>
         </el-table-column>
         <el-table-column prop="requestMethod" label="请求方式" width="100" align="center" />
-        <el-table-column prop="operName" label="操作人员" width="120" />
-        <el-table-column prop="operIp" label="操作IP" width="130" show-overflow-tooltip />
+        <el-table-column prop="operName" label="操作人员" min-width="120" />
+        <el-table-column prop="operIp" label="操作IP" min-width="130" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
@@ -83,7 +84,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="operTime" label="操作时间" width="180" align="center" />
+        <el-table-column prop="operTime" label="操作时间" min-width="180" align="center" />
         <el-table-column prop="costTime" label="消耗时间" width="100" align="center">
           <template #default="{ row }">
             {{ row.costTime }}ms

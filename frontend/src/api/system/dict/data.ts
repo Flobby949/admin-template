@@ -1,15 +1,15 @@
 import request from '@/utils/request'
 
 export interface DictDataVO {
-  dictCode: number
+  id: number
   dictSort: number
   dictLabel: string
   dictValue: string
   dictType: string
   cssClass?: string
   listClass?: string // default/primary/success/warning/danger
-  isDefault: string // Y/N
-  status: string // 1=normal, 0=disable (adjust based on actual backend: usually '1' or '0', or '0'/'1')
+  isDefault: number // 0=否, 1=是
+  status: number // 0=停用, 1=正常
   remark?: string
   createTime?: string
 }
@@ -38,9 +38,9 @@ export function listData(query: DictDataQuery) {
 }
 
 // 查询字典数据详细
-export function getData(dictCode: number) {
+export function getData(id: number) {
   return request<DictDataVO>({
-    url: `/system/dict/data/${dictCode}`,
+    url: `/system/dict/data/${id}`,
     method: 'get'
   })
 }
@@ -72,9 +72,9 @@ export function updateData(data: Partial<DictDataVO>) {
 }
 
 // 删除字典数据
-export function delData(dictCode: number) {
+export function delData(id: number) {
   return request({
-    url: `/system/dict/data/${dictCode}`,
+    url: `/system/dict/data/${id}`,
     method: 'delete'
   })
 }

@@ -133,7 +133,7 @@ const handleCopy = async (text: string) => {
 <style scoped lang="scss">
 .code-box {
   position: relative;
-  background-color: #f5f7fa;
+  background-color: var(--el-fill-color-light);
   padding: 10px;
   border-radius: 4px;
   overflow: auto;
@@ -141,6 +141,11 @@ const handleCopy = async (text: string) => {
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
+
+  pre {
+    margin: 0;
+    color: var(--el-text-color-primary);
+  }
 
   .copy-btn {
     position: absolute;
@@ -150,11 +155,11 @@ const handleCopy = async (text: string) => {
 }
 
 .error-box {
-  color: #f56c6c;
-  background-color: #fef0f0;
+  color: var(--el-color-danger);
+  background-color: var(--el-color-danger-light-9);
 }
 
 .text-danger {
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 </style>

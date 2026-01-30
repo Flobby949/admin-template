@@ -27,8 +27,8 @@
       <el-form-item label="部门名称" prop="deptName">
         <el-input v-model="form.deptName" placeholder="请输入部门名称" />
       </el-form-item>
-      <el-form-item label="显示排序" prop="orderNum">
-        <el-input-number v-model="form.orderNum" :min="0" :max="9999" />
+      <el-form-item label="显示排序" prop="sortOrder">
+        <el-input-number v-model="form.sortOrder" :min="0" :max="9999" />
       </el-form-item>
       <el-form-item label="负责人" prop="leader">
         <el-input v-model="form.leader" placeholder="请输入负责人" maxlength="20" />
@@ -82,7 +82,7 @@ const form = reactive<DeptForm>({
   id: undefined,
   parentId: undefined,
   deptName: '',
-  orderNum: 0,
+  sortOrder: 0,
   leader: '',
   phone: '',
   email: '',
@@ -92,7 +92,7 @@ const form = reactive<DeptForm>({
 const rules: FormRules = {
   parentId: [{ required: true, message: '请选择上级部门', trigger: 'change' }],
   deptName: [{ required: true, message: '请输入部门名称', trigger: 'blur' }],
-  orderNum: [{ required: true, message: '请输入显示排序', trigger: 'blur' }],
+  sortOrder: [{ required: true, message: '请输入显示排序', trigger: 'blur' }],
   email: [{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: ['blur', 'change'] }]
 }
@@ -102,7 +102,7 @@ const reset = () => {
   form.id = undefined
   form.parentId = undefined
   form.deptName = ''
-  form.orderNum = 0
+  form.sortOrder = 0
   form.leader = ''
   form.phone = ''
   form.email = ''

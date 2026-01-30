@@ -36,7 +36,7 @@ public class RoleController {
 
     @Operation(summary = "获取角色详情")
     @GetMapping("/{id}")
-    @RequiresPermission("system:role:query")
+    @RequiresPermission("system:role:list")
     public Result<RoleVO> getById(
             @Parameter(description = "角色ID") @PathVariable("id") Long id) {
         RoleVO role = roleService.getRoleById(id);
@@ -83,7 +83,7 @@ public class RoleController {
 
     @Operation(summary = "获取角色菜单ID列表")
     @GetMapping("/{id}/menus")
-    @RequiresPermission("system:role:query")
+    @RequiresPermission("system:role:list")
     public Result<List<Long>> getRoleMenuIds(
             @Parameter(description = "角色ID") @PathVariable("id") Long id) {
         List<Long> menuIds = roleService.getRoleMenuIds(id);
