@@ -14,9 +14,14 @@ import top.flobby.admin.common.annotation.DataScope;
 import top.flobby.admin.common.core.PageResult;
 import top.flobby.admin.common.exception.BusinessException;
 import top.flobby.admin.system.domain.entity.User;
+import top.flobby.admin.system.domain.entity.UserDept;
 import top.flobby.admin.system.domain.entity.UserRole;
 import top.flobby.admin.system.domain.repository.UserRepository;
 import top.flobby.admin.system.domain.repository.UserRoleRepository;
+import top.flobby.admin.system.infrastructure.repository.JpaDepartmentRepository;
+import top.flobby.admin.system.infrastructure.repository.JpaRoleRepository;
+import top.flobby.admin.system.infrastructure.repository.JpaUserDeptRepository;
+import top.flobby.admin.system.infrastructure.repository.JpaUserRoleRepository;
 import top.flobby.admin.system.interfaces.dto.UserDTO;
 import top.flobby.admin.system.interfaces.query.UserQuery;
 import top.flobby.admin.system.interfaces.vo.UserVO;
@@ -38,6 +43,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final JpaUserDeptRepository jpaUserDeptRepository;
+    private final JpaUserRoleRepository jpaUserRoleRepository;
+    private final JpaRoleRepository jpaRoleRepository;
+    private final JpaDepartmentRepository jpaDepartmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -120,6 +129,11 @@ public class UserService {
             saveUserRoles(savedUser.getId(), dto.getRoleIds());
         }
 
+        // 保存用户部门关联
+        if (dto.getDeptIds() != null && !dto.getDeptIds().isEmpty()) {
+            saveUserDepts(savedUser.getId(), dto.getDeptIds());
+        }
+
         log.info("创建用户成功，用户ID: {}, 用户名: {}", savedUser.getId(), savedUser.getUsername());
         return savedUser.getId();
     }
@@ -190,6 +204,16 @@ public class UserService {
             }
         }
 
+        // 更新用户部门关联
+        if (dto.getDeptIds() != null) {
+            // 删除旧的部门关联
+            jpaUserDeptRepository.deleteByUserId(user.getId());
+            // 保存新的部门关联
+            if (!dto.getDeptIds().isEmpty()) {
+                saveUserDepts(user.getId(), dto.getDeptIds());
+            }
+        }
+
         log.info("更新用户成功，用户ID: {}, 用户名: {}", user.getId(), user.getUsername());
     }
 
@@ -212,6 +236,9 @@ public class UserService {
 
         // 删除用户角色关联
         userRoleRepository.deleteByUserId(id);
+
+        // 删除用户部门关联
+        jpaUserDeptRepository.deleteByUserId(id);
 
         log.info("删除用户成功，用户ID: {}, 用户名: {}", id, user.getUsername());
     }
@@ -288,6 +315,20 @@ public class UserService {
     }
 
     /**
+     * 保存用户部门关联
+     */
+    private void saveUserDepts(Long userId, List<Long> deptIds) {
+        List<UserDept> userDepts = new ArrayList<>();
+        for (Long deptId : deptIds) {
+            UserDept userDept = new UserDept();
+            userDept.setUserId(userId);
+            userDept.setDeptId(deptId);
+            userDepts.add(userDept);
+        }
+        jpaUserDeptRepository.saveAll(userDepts);
+    }
+
+    /**
      * 校验用户DTO
      */
     private void validateUserDTO(UserDTO dto, boolean isCreate) {
@@ -313,9 +354,32 @@ public class UserService {
         vo.setCreateBy(user.getCreateBy());
         vo.setUpdateBy(user.getUpdateBy());
 
-        // TODO: 加载用户角色和部门信息
-        vo.setRoles(new ArrayList<>());
-        vo.setDepts(new ArrayList<>());
+        // 加载用户角色信息
+        List<UserRole> userRoles = jpaUserRoleRepository.findByUserId(user.getId());
+        List<UserVO.RoleInfo> roleInfos = new ArrayList<>();
+        for (UserRole userRole : userRoles) {
+            jpaRoleRepository.findById(userRole.getRoleId()).ifPresent(role -> {
+                UserVO.RoleInfo roleInfo = new UserVO.RoleInfo();
+                roleInfo.setId(role.getId());
+                roleInfo.setName(role.getRoleName());
+                roleInfo.setCode(role.getRoleCode());
+                roleInfos.add(roleInfo);
+            });
+        }
+        vo.setRoles(roleInfos);
+
+        // 加载用户部门信息
+        List<UserDept> userDepts = jpaUserDeptRepository.findByUserId(user.getId());
+        List<UserVO.DeptInfo> deptInfos = new ArrayList<>();
+        for (UserDept userDept : userDepts) {
+            jpaDepartmentRepository.findById(userDept.getDeptId()).ifPresent(dept -> {
+                UserVO.DeptInfo deptInfo = new UserVO.DeptInfo();
+                deptInfo.setId(dept.getId());
+                deptInfo.setName(dept.getDeptName());
+                deptInfos.add(deptInfo);
+            });
+        }
+        vo.setDepts(deptInfos);
 
         return vo;
     }

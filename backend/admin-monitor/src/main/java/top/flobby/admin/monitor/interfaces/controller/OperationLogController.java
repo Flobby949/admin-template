@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import top.flobby.admin.common.core.PageResult;
 import top.flobby.admin.common.core.Result;
@@ -23,8 +22,7 @@ import java.util.List;
  * - 统一异常处理
  * <p>
  * 权限控制:
- * - 所有接口仅超级管理员可访问
- * - 使用 @PreAuthorize("hasRole('ADMIN')") 注解
+ * - 所有认证用户可访问
  *
  * @author flobby
  * @date 2026-01-28
@@ -33,7 +31,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/monitor/operation-logs")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class OperationLogController {
 
     private final OperationLogService operationLogService;

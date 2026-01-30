@@ -1,6 +1,7 @@
 package top.flobby.admin.system.infrastructure.repository;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,16 +9,21 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import top.flobby.admin.common.utils.DataScopeUtils;
+import top.flobby.admin.system.domain.entity.Department;
 import top.flobby.admin.system.domain.entity.User;
 import top.flobby.admin.system.domain.entity.UserDept;
+import top.flobby.admin.system.domain.repository.DepartmentRepository;
 import top.flobby.admin.system.domain.repository.UserRepository;
 import top.flobby.admin.system.interfaces.query.UserQuery;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 用户仓储实现
@@ -27,6 +33,7 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
 
     private final JpaUserRepository jpaUserRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
     public Optional<User> findByUsername(String username) {
@@ -86,6 +93,16 @@ public class UserRepositoryImpl implements UserRepository {
                 predicates.add(criteriaBuilder.equal(root.get("status"), query.getStatus()));
             }
 
+            // 部门过滤（包含子部门，通过子查询关联 sys_user_dept 表）
+            if (query.getDeptId() != null) {
+                Set<Long> deptIds = getDescendantDeptIds(query.getDeptId());
+                Subquery<Long> deptSubquery = criteriaQuery.subquery(Long.class);
+                var userDeptRoot = deptSubquery.from(UserDept.class);
+                deptSubquery.select(userDeptRoot.get("userId"))
+                        .where(userDeptRoot.get("deptId").in(deptIds));
+                predicates.add(root.get("id").in(deptSubquery));
+            }
+
             // 创建时间范围查询
             if (StringUtils.hasText(query.getStartTime())) {
                 LocalDateTime startTime = LocalDateTime.parse(query.getStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -113,12 +130,6 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaUserRepository.findByRoleId(roleId);
     }
 
-    // TODO: Phase 6 实现 - 需要 UserDept 实体
-    // @Override
-    // public List<User> findByDeptId(Long deptId) {
-    //     return jpaUserRepository.findByDeptId(deptId);
-    // }
-
     @Override
     public boolean existsByUsername(String username) {
         return jpaUserRepository.existsByUsernameAndDeletedEquals(username, 0);
@@ -132,5 +143,37 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByPhone(String phone) {
         return jpaUserRepository.existsByPhoneAndDeletedEquals(phone, 0);
+    }
+
+    /**
+     * 获取部门的所有子孙部门ID
+     *
+     * @param deptId 部门ID
+     * @return 子孙部门ID集合（包含自身）
+     */
+    private Set<Long> getDescendantDeptIds(Long deptId) {
+        Set<Long> result = new HashSet<>();
+        result.add(deptId);
+
+        Department dept = departmentRepository.findById(deptId).orElse(null);
+        if (dept == null) {
+            return result;
+        }
+
+        // 构建祖级路径前缀
+        String ancestorsPrefix;
+        if (dept.getAncestors() == null || dept.getAncestors().isEmpty()) {
+            ancestorsPrefix = String.valueOf(deptId);
+        } else {
+            ancestorsPrefix = dept.getAncestors() + "," + deptId;
+        }
+
+        // 查询所有子孙部门
+        List<Department> descendants = departmentRepository.findByAncestorsStartingWith(ancestorsPrefix);
+        result.addAll(descendants.stream()
+                .map(Department::getId)
+                .collect(Collectors.toSet()));
+
+        return result;
     }
 }

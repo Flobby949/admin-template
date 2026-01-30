@@ -42,12 +42,14 @@ public class DepartmentController {
     /**
      * 获取部门树
      * <p>
-     * 查询所有部门并以树形结构返回,用于部门管理页面展示
+     * 查询所有部门并以树形结构返回,用于部门管理页面展示和用户选择部门
+     * 此接口允许所有已认证用户访问,覆盖类级别的ADMIN权限限制
      *
      * @return 部门树列表
      */
     @Operation(summary = "获取部门树", description = "查询所有部门并以树形结构返回")
     @GetMapping("/tree")
+    @PreAuthorize("isAuthenticated()")
     public Result<List<DepartmentVO>> listDepartmentTree() {
         List<DepartmentVO> tree = departmentService.listDepartmentTree();
         return Result.success(tree);
