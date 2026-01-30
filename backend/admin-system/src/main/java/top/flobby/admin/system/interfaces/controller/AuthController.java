@@ -52,4 +52,11 @@ public class AuthController {
     public Result<Set<String>> getPermissions() {
         return Result.success(authService.getCurrentUserPermissions());
     }
+
+    @Operation(summary = "修改密码")
+    @PutMapping("/password")
+    public Result<Void> changePassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
+        authService.changePassword(oldPassword, newPassword);
+        return Result.success();
+    }
 }

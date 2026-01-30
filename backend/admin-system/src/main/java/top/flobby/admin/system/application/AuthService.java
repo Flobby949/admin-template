@@ -5,7 +5,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import top.flobby.admin.common.exception.BusinessException;
 import top.flobby.admin.common.utils.JwtUtils;
 import top.flobby.admin.system.domain.entity.User;
@@ -32,6 +35,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PermissionCacheService permissionCacheService;
     private final MenuService menuService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 登录
@@ -110,5 +114,35 @@ public class AuthService {
                 .orElseThrow(() -> new BusinessException("用户不存在"));
 
         return menuService.buildRoutersByUserId(user.getId());
+    }
+
+    /**
+     * 修改当前用户密码
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(String oldPassword, String newPassword) {
+        // 获取当前用户
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("用户不存在"));
+
+        // 验证旧密码
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BusinessException("原密码错误");
+        }
+
+        // 校验新密码
+        if (!StringUtils.hasText(newPassword) || newPassword.length() < 6 || newPassword.length() > 20) {
+            throw new BusinessException("新密码长度必须在6-20个字符之间");
+        }
+
+        // 新旧密码不能相同
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new BusinessException("新密码不能与原密码相同");
+        }
+
+        // 更新密码
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

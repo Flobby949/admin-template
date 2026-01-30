@@ -38,6 +38,15 @@ export function getPermissions() {
   })
 }
 
+// 修改密码
+export function changePassword(oldPassword: string, newPassword: string) {
+  return request<void>({
+    url: 'auth/password',
+    method: 'put',
+    params: { oldPassword, newPassword }
+  })
+}
+
 // 路由类型定义
 export interface RouterMeta {
   title: string

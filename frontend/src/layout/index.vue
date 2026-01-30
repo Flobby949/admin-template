@@ -70,9 +70,9 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item>
-                    <el-icon><User /></el-icon>
-                    个人中心
+                  <el-dropdown-item @click="showChangePassword = true">
+                    <el-icon><Lock /></el-icon>
+                    修改密码
                   </el-dropdown-item>
                   <el-dropdown-item divided @click="handleLogout">
                     <el-icon><SwitchButton /></el-icon>
@@ -92,6 +92,9 @@
         </el-main>
       </el-container>
     </el-container>
+
+    <!-- 修改密码对话框 -->
+    <ChangePassword v-model="showChangePassword" />
   </div>
 </template>
 
@@ -100,10 +103,11 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
 import { usePermissionStore } from '@/stores/permission'
-import { HomeFilled, ElementPlus, ArrowDown, User, SwitchButton, Fold, Expand } from '@element-plus/icons-vue'
+import { HomeFilled, ElementPlus, ArrowDown, Lock, SwitchButton, Fold, Expand } from '@element-plus/icons-vue'
 import SidebarItem from './components/SidebarItem.vue'
 import ThemeToggle from '@/components/ThemeToggle/index.vue'
 import ThemeSettings from '@/components/ThemeSettings/index.vue'
+import ChangePassword from '@/components/ChangePassword/index.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -113,6 +117,7 @@ const permissionStore = usePermissionStore()
 // 响应式状态
 const isCollapsed = ref(false)
 const windowWidth = ref(window.innerWidth)
+const showChangePassword = ref(false)
 
 // 移动端断点
 const MOBILE_BREAKPOINT = 768
