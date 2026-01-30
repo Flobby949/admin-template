@@ -1,18 +1,48 @@
 <template>
-  <div class="app-container">
+  <div class="user-page">
     <el-row :gutter="20">
       <!-- 部门树 -->
       <el-col :span="4" :xs="24">
-        <div class="head-container">
+        <div class="dept-tree-container">
           <dept-tree @node-click="handleDeptClick" />
         </div>
       </el-col>
+
       <!-- 用户数据 -->
       <el-col :span="20" :xs="24">
-        <div class="user-container">
-          <!-- 搜索栏 -->
-          <el-card class="search-card" shadow="never">
-            <el-form :model="queryForm" :inline="true" label-width="68px">
+        <!-- 页面标题 -->
+        <div class="page-header">
+          <div class="header-left">
+            <h2 class="page-title">用户管理</h2>
+            <span class="page-subtitle">管理系统用户及权限分配</span>
+          </div>
+          <div class="header-actions">
+            <el-button
+              type="primary"
+              icon="Plus"
+              @click="handleAdd"
+              v-permission="'system:user:add'"
+            >
+              新增用户
+            </el-button>
+            <el-button
+              type="danger"
+              plain
+              icon="Delete"
+              :disabled="selectedIds.length === 0"
+              @click="handleBatchDelete"
+              v-permission="'system:user:remove'"
+            >
+              批量删除
+            </el-button>
+          </div>
+        </div>
+
+        <!-- 主内容卡片 -->
+        <div class="main-card">
+          <!-- 搜索区域 -->
+          <div class="filter-container">
+            <el-form :model="queryForm" :inline="true" class="filter-form">
               <el-form-item label="用户名">
                 <el-input
                   v-model="queryForm.username"
@@ -38,83 +68,63 @@
                 />
               </el-form-item>
               <el-form-item label="状态">
-                <el-select v-model="queryForm.status" placeholder="请选择状态" clearable style="width: 240px">
+                <el-select v-model="queryForm.status" placeholder="全部状态" clearable style="width: 140px">
                   <el-option label="启用" :value="1" />
                   <el-option label="禁用" :value="0" />
                 </el-select>
               </el-form-item>
-              <el-form-item>
+              <el-form-item class="filter-actions">
                 <el-button type="primary" icon="Search" @click="handleQuery">查询</el-button>
                 <el-button icon="Refresh" @click="handleReset">重置</el-button>
               </el-form-item>
             </el-form>
-          </el-card>
-
-          <!-- 操作栏 -->
-          <el-card class="toolbar-card" shadow="never">
-            <el-row :gutter="10">
-              <el-col :span="1.5">
-                <el-button
-                  type="primary"
-                  plain
-                  icon="Plus"
-                  @click="handleAdd"
-                  v-permission="'system:user:add'"
-                >
-                  新增
-                </el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button
-                  type="danger"
-                  plain
-                  icon="Delete"
-                  :disabled="selectedIds.length === 0"
-                  @click="handleBatchDelete"
-                  v-permission="'system:user:remove'"
-                >
-                  批量删除
-                </el-button>
-              </el-col>
-            </el-row>
-          </el-card>
+          </div>
 
           <!-- 数据表格 -->
-          <el-card class="table-card" shadow="never">
-            <el-table
-              v-loading="loading"
-              :data="userList"
-              @selection-change="handleSelectionChange"
-              border
-              stripe
-            >
-              <el-table-column type="selection" width="55" align="center" />
-              <el-table-column label="用户ID" prop="id" width="80" align="center" />
-              <el-table-column label="用户名" prop="username" width="120" show-overflow-tooltip />
-              <el-table-column label="姓名" prop="realName" width="120" show-overflow-tooltip />
-              <el-table-column label="部门" prop="depts" width="150" show-overflow-tooltip>
-                <template #default="{ row }">
-                  <span v-for="(dept, index) in row.depts" :key="dept.id">
-                    {{ dept.name }}{{ index < row.depts.length - 1 ? ', ' : '' }}
-                  </span>
-                </template>
-              </el-table-column>
-              <el-table-column label="邮箱" prop="email" width="180" show-overflow-tooltip />
-              <el-table-column label="手机号" prop="phone" width="120" />
-              <el-table-column label="状态" width="80" align="center">
-                <template #default="{ row }">
-                  <el-switch
-                    v-model="row.status"
-                    :active-value="1"
-                    :inactive-value="0"
-                    @change="handleStatusChange(row)"
-                    v-permission="'system:user:edit'"
-                  />
-                </template>
-              </el-table-column>
-              <el-table-column label="创建时间" prop="createTime" width="180" />
-              <el-table-column label="操作" fixed="right" width="240" align="center">
-                <template #default="{ row }">
+          <el-table
+            v-loading="loading"
+            :data="userList"
+            @selection-change="handleSelectionChange"
+            class="modern-table"
+          >
+            <el-table-column type="selection" width="50" align="center" />
+            <el-table-column label="用户ID" prop="id" width="80" align="center" />
+            <el-table-column label="用户名" prop="username" min-width="120" show-overflow-tooltip>
+              <template #default="{ row }">
+                <span class="user-name">{{ row.username }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="姓名" prop="realName" min-width="100" show-overflow-tooltip />
+            <el-table-column label="部门" prop="depts" min-width="150" show-overflow-tooltip>
+              <template #default="{ row }">
+                <el-tag
+                  v-for="dept in row.depts"
+                  :key="dept.id"
+                  size="small"
+                  class="dept-tag"
+                >
+                  {{ dept.name }}
+                </el-tag>
+                <span v-if="!row.depts?.length" class="text-placeholder">-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="邮箱" prop="email" min-width="180" show-overflow-tooltip />
+            <el-table-column label="手机号" prop="phone" width="130" />
+            <el-table-column label="状态" width="90" align="center">
+              <template #default="{ row }">
+                <el-switch
+                  v-model="row.status"
+                  :active-value="1"
+                  :inactive-value="0"
+                  @change="handleStatusChange(row)"
+                  v-permission="'system:user:edit'"
+                />
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="createTime" width="170" />
+            <el-table-column label="操作" fixed="right" width="200" align="center">
+              <template #default="{ row }">
+                <div class="action-buttons">
                   <el-button
                     type="primary"
                     link
@@ -142,11 +152,13 @@
                   >
                     删除
                   </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
 
-            <!-- 分页 -->
+          <!-- 分页 -->
+          <div class="pagination-container">
             <el-pagination
               v-model:current-page="queryForm.pageNum"
               v-model:page-size="queryForm.pageSize"
@@ -156,47 +168,48 @@
               @size-change="handleQuery"
               @current-change="handleQuery"
             />
-          </el-card>
-
-          <!-- 用户对话框 -->
-          <UserDialog
-            v-model="dialogVisible"
-            :user-id="currentUserId"
-            @success="handleQuery"
-          />
-
-          <!-- 重置密码对话框 -->
-          <el-dialog
-            v-model="passwordDialogVisible"
-            title="重置密码"
-            width="400px"
-          >
-            <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="80px">
-              <el-form-item label="新密码" prop="newPassword">
-                <el-input
-                  v-model="passwordForm.newPassword"
-                  type="password"
-                  placeholder="请输入新密码"
-                  show-password
-                />
-              </el-form-item>
-              <el-form-item label="确认密码" prop="confirmPassword">
-                <el-input
-                  v-model="passwordForm.confirmPassword"
-                  type="password"
-                  placeholder="请再次输入新密码"
-                  show-password
-                />
-              </el-form-item>
-            </el-form>
-            <template #footer>
-              <el-button @click="passwordDialogVisible = false">取消</el-button>
-              <el-button type="primary" @click="handleConfirmResetPassword">确定</el-button>
-            </template>
-          </el-dialog>
+          </div>
         </div>
       </el-col>
     </el-row>
+
+    <!-- 用户对话框 -->
+    <UserDialog
+      v-model="dialogVisible"
+      :user-id="currentUserId"
+      @success="handleQuery"
+    />
+
+    <!-- 重置密码对话框 -->
+    <el-dialog
+      v-model="passwordDialogVisible"
+      title="重置密码"
+      width="420px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="90px">
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input
+            v-model="passwordForm.newPassword"
+            type="password"
+            placeholder="请输入新密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            placeholder="请再次输入新密码"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="passwordDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleConfirmResetPassword">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -285,9 +298,6 @@ const handleReset = () => {
   queryForm.realName = ''
   queryForm.phone = ''
   queryForm.status = undefined
-  // Note: we usually don't reset deptId when resetting search form if user selected it from tree
-  // But standard "Reset" button usually resets everything.
-  // Let's reset everything for now.
   queryForm.deptId = undefined
   queryForm.pageNum = 1
   queryForm.pageSize = 10
@@ -375,7 +385,6 @@ const handleStatusChange = async (row: UserVO) => {
     ElMessage.success('状态修改成功')
   } catch (error) {
     ElMessage.error('状态修改失败')
-    // 恢复原状态
     row.status = row.status === 1 ? 0 : 1
   }
 }
@@ -392,19 +401,133 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.app-container {
-  padding: 20px;
+.user-page {
+  height: 100%;
 }
-.user-container {
-  .search-card,
-  .toolbar-card,
-  .table-card {
-    margin-bottom: 20px;
+
+.dept-tree-container {
+  padding: 16px 16px 16px 0;
+  border-right: 1px solid var(--border-light);
+  height: calc(100vh - 64px - 48px);
+  overflow: hidden;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+
+  .header-left {
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
   }
 
-  .el-pagination {
-    margin-top: 20px;
-    justify-content: flex-end;
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.main-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  padding: 24px;
+}
+
+.filter-container {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--border-color);
+
+  .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+
+    :deep(.el-form-item) {
+      margin-bottom: 0;
+      margin-right: 0;
+    }
+
+    :deep(.el-form-item__label) {
+      font-weight: 500;
+    }
+
+    .filter-actions {
+      margin-left: auto;
+    }
+  }
+}
+
+.modern-table {
+  :deep(.el-table__header th) {
+    background-color: var(--bg-body) !important;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  .dept-tag {
+    margin-right: 4px;
+    margin-bottom: 2px;
+  }
+
+  .text-placeholder {
+    color: var(--text-placeholder);
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  .filter-container .filter-form {
+    .filter-actions {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+
+  .dept-tree-container {
+    height: auto;
+    max-height: 300px;
+    margin-bottom: 16px;
+    border-right: none;
+    padding: 0 0 16px 0;
   }
 }
 </style>

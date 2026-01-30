@@ -25,6 +25,7 @@
         :key="child.path"
         :item="child"
         :base-path="resolvePath(item.path)"
+        :is-collapse="isCollapse"
       />
     </el-sub-menu>
   </template>
@@ -38,10 +39,12 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 interface Props {
   item: RouteRecordRaw
   basePath?: string
+  isCollapse?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  basePath: ''
+  basePath: '',
+  isCollapse: false
 })
 
 // 获取可见的子菜单
@@ -51,7 +54,7 @@ const visibleChildren = computed(() => {
 })
 
 // 是否有可见的子菜单
-// 如果有子菜单（即使只有一个），也应该显示为子菜单结构
+// 只要有子菜单就显示为子菜单结构
 const hasVisibleChildren = computed(() => {
   return visibleChildren.value.length >= 1
 })

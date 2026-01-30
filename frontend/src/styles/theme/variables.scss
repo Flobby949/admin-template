@@ -1,0 +1,102 @@
+/* ============================================
+   Theme Variables (Light & Dark)
+   ============================================ */
+
+:root {
+  /* ----------------------------------
+     Light Mode (Default)
+     ---------------------------------- */
+
+  /* Brand Colors */
+  --primary-color: #2563EB;        /* Electric Blue */
+  --primary-hover: #1d4ed8;        /* Blue 700 */
+  --primary-light: #EFF6FF;        /* Blue 50 - 激活背景 */
+  --primary-lighter: #DBEAFE;      /* Blue 100 */
+
+  /* Background Colors */
+  --bg-body: #F8FAFC;              /* Slate 50 - 页面背景 */
+  --bg-card: #FFFFFF;              /* 卡片背景 */
+  --bg-sidebar: #FFFFFF;           /* 侧边栏背景 */
+  --bg-hover: #F1F5F9;             /* Slate 100 - 悬停背景 */
+  --bg-modal: #FFFFFF;             /* 模态框背景 */
+
+  /* Text Colors */
+  --text-main: #0F172A;            /* Slate 900 - 主文字 */
+  --text-regular: #334155;         /* Slate 700 - 常规文字 */
+  --text-secondary: #64748B;       /* Slate 500 - 次要文字 */
+  --text-placeholder: #94A3B8;     /* Slate 400 - 占位符 */
+
+  /* Border Colors */
+  --border-color: #E2E8F0;         /* Slate 200 */
+  --border-light: #F1F5F9;         /* Slate 100 */
+
+  /* Status Colors */
+  --success-color: #10B981;        /* Emerald 500 */
+  --warning-color: #F59E0B;        /* Amber 500 */
+  --danger-color: #EF4444;         /* Red 500 */
+  --info-color: #3B82F6;           /* Blue 500 */
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-sidebar: 1px 0 0 0 var(--border-color);
+}
+
+/* ----------------------------------
+   Dark Mode
+   ---------------------------------- */
+html.dark {
+  /* Brand Colors - 深色模式下使用 --primary-color-dark（由 JS 动态设置）*/
+  /* 如果 JS 未设置，则回退到默认蓝色 */
+  --primary-color: var(--primary-color-dark, #3B82F6);
+  --primary-hover: #60A5FA;        /* Blue 400 */
+  --primary-light: #1E293B;        /* Slate 800 - Active background */
+  --primary-lighter: #1D4ED8;      /* Blue 700 - Accents */
+
+  /* Background Colors */
+  --bg-body: #0F172A;              /* Slate 900 */
+  --bg-card: #1E293B;              /* Slate 800 */
+  --bg-sidebar: #1E293B;           /* Slate 800 */
+  --bg-hover: #334155;             /* Slate 700 */
+  --bg-modal: #1E293B;             /* Slate 800 */
+
+  /* Text Colors */
+  --text-main: #F1F5F9;            /* Slate 100 */
+  --text-regular: #CBD5E1;         /* Slate 300 */
+  --text-secondary: #94A3B8;       /* Slate 400 */
+  --text-placeholder: #64748B;     /* Slate 500 */
+
+  /* Border Colors */
+  --border-color: #334155;         /* Slate 700 */
+  --border-light: #1E293B;         /* Slate 800 */
+
+  /* Status Colors - Slightly lighter/brighter */
+  --success-color: #34D399;        /* Emerald 400 */
+  --warning-color: #FBBF24;        /* Amber 400 */
+  --danger-color: #F87171;         /* Red 400 */
+  --info-color: #60A5FA;           /* Blue 400 */
+
+  /* Shadows - Subtler or replaced by borders in high contrast modes,
+     but here we keep subtle shadows for depth */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-sidebar: 1px 0 0 0 var(--border-color);
+
+  /* Element Plus 变量覆盖 - 确保与自定义变量统一 */
+  --el-bg-color: var(--bg-body);
+  --el-bg-color-page: var(--bg-body);
+  --el-bg-color-overlay: var(--bg-card);
+  --el-text-color-primary: var(--text-main);
+  --el-text-color-regular: var(--text-regular);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-text-color-placeholder: var(--text-placeholder);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--border-light);
+  --el-color-primary: var(--primary-color);
+  --el-color-success: var(--success-color);
+  --el-color-warning: var(--warning-color);
+  --el-color-danger: var(--danger-color);
+  --el-color-info: var(--info-color);
+}
