@@ -248,12 +248,35 @@ html.dark {
 .el-pagination {
   --el-pagination-button-bg-color: var(--bg-card);
   --el-pagination-hover-color: var(--primary-color);
+  --el-pagination-text-color: var(--text-regular);
+  --el-pagination-bg-color: var(--bg-card);
+  --el-pagination-button-color: var(--text-regular);
+  --el-pagination-button-disabled-color: var(--text-placeholder);
+  --el-pagination-button-disabled-bg-color: var(--bg-card);
 
   .el-pager li {
     border-radius: var(--radius-sm);
+    color: var(--text-regular);
+    background-color: var(--bg-card);
+
+    &:hover {
+      color: var(--primary-color);
+    }
 
     &.is-active {
       background-color: var(--primary-color);
+      color: #fff;
+    }
+  }
+
+  .el-pagination__total,
+  .el-pagination__jump {
+    color: var(--text-regular);
+  }
+
+  .el-pagination__editor {
+    .el-input__wrapper {
+      background-color: var(--bg-card);
     }
   }
 }
