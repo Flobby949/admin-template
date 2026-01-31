@@ -1,7 +1,15 @@
 <template>
   <el-tag
     v-if="currentDict"
-    :type="currentDict.listClass === 'primary' || currentDict.listClass === 'success' || currentDict.listClass === 'info' || currentDict.listClass === 'warning' || currentDict.listClass === 'danger' ? currentDict.listClass : ''"
+    :type="
+      currentDict.listClass === 'primary' ||
+      currentDict.listClass === 'success' ||
+      currentDict.listClass === 'info' ||
+      currentDict.listClass === 'warning' ||
+      currentDict.listClass === 'danger'
+        ? currentDict.listClass
+        : ''
+    "
     :class="currentDict.cssClass"
   >
     {{ currentDict.dictLabel }}

@@ -6,12 +6,7 @@
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="formRules"
-      label-width="100px"
-    >
+    <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
       <el-form-item label="父级菜单" prop="parentId">
         <el-tree-select
           v-model="formData.parentId"
@@ -53,19 +48,11 @@
 
       <!-- 目录和菜单类型显示图标 -->
       <el-form-item v-if="formData.menuType !== 3" label="图标" prop="icon">
-        <IconSelect
-          v-model="formData.icon"
-          placeholder="请选择图标"
-          clearable
-        />
+        <IconSelect v-model="formData.icon" placeholder="请选择图标" clearable />
       </el-form-item>
 
       <!-- 菜单类型显示路由路径和组件路径 -->
-      <el-form-item
-        v-if="formData.menuType === 2"
-        label="路由路径"
-        prop="routePath"
-      >
+      <el-form-item v-if="formData.menuType === 2" label="路由路径" prop="routePath">
         <el-input
           v-model="formData.routePath"
           placeholder="请输入路由路径（如：/system/user）"
@@ -73,11 +60,7 @@
         />
       </el-form-item>
 
-      <el-form-item
-        v-if="formData.menuType === 2"
-        label="组件路径"
-        prop="component"
-      >
+      <el-form-item v-if="formData.menuType === 2" label="组件路径" prop="component">
         <el-input
           v-model="formData.component"
           placeholder="请输入组件路径（如：system/user/index）"
@@ -86,11 +69,7 @@
       </el-form-item>
 
       <!-- 按钮类型显示权限标识 -->
-      <el-form-item
-        v-if="formData.menuType === 3"
-        label="权限标识"
-        prop="permission"
-      >
+      <el-form-item v-if="formData.menuType === 3" label="权限标识" prop="permission">
         <el-input
           v-model="formData.permission"
           placeholder="请输入权限标识（如：system:user:add）"
@@ -132,9 +111,7 @@
 
     <template #footer>
       <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-        确定
-      </el-button>
+      <el-button type="primary" :loading="submitLoading" @click="handleSubmit"> 确定 </el-button>
     </template>
   </el-dialog>
 </template>
@@ -166,7 +143,7 @@ const emit = defineEmits<{
 // 对话框显示状态
 const dialogVisible = computed({
   get: () => props.visible,
-  set: (val) => emit('update:visible', val)
+  set: val => emit('update:visible', val)
 })
 
 // 对话框标题
@@ -208,9 +185,7 @@ const formRules = computed<FormRules>(() => ({
     { required: true, message: '请输入菜单名称', trigger: 'blur' },
     { min: 1, max: 50, message: '菜单名称长度必须在1-50之间', trigger: 'blur' }
   ],
-  menuType: [
-    { required: true, message: '请选择菜单类型', trigger: 'change' }
-  ],
+  menuType: [{ required: true, message: '请选择菜单类型', trigger: 'change' }],
   routePath: [
     {
       required: formData.menuType === 2,
@@ -301,7 +276,7 @@ watch(
 // 监听对话框显示状态，加载数据
 watch(
   () => props.visible,
-  (visible) => {
+  visible => {
     if (visible && props.menuId) {
       fetchMenuData()
     }

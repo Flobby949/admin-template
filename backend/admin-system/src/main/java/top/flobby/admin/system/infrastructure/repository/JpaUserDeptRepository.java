@@ -20,6 +20,11 @@ public interface JpaUserDeptRepository extends JpaRepository<UserDept, Long> {
     List<UserDept> findByUserId(Long userId);
 
     /**
+     * 根据用户ID列表批量查询部门关联
+     */
+    List<UserDept> findByUserIdIn(List<Long> userIds);
+
+    /**
      * 根据部门ID查询用户关联
      */
     List<UserDept> findByDeptId(Long deptId);

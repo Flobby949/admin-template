@@ -8,16 +8,10 @@
       </div>
       <h1 class="error-title">404</h1>
       <p class="error-message">抱歉，您访问的页面不存在</p>
-      <p class="error-description">
-        请检查您输入的网址是否正确，或者点击下面的按钮返回首页
-      </p>
+      <p class="error-description">请检查您输入的网址是否正确，或者点击下面的按钮返回首页</p>
       <div class="error-actions">
-        <el-button type="primary" size="large" @click="goHome">
-          返回首页
-        </el-button>
-        <el-button size="large" @click="goBack">
-          返回上一页
-        </el-button>
+        <el-button type="primary" size="large" @click="goHome"> 返回首页 </el-button>
+        <el-button size="large" @click="goBack"> 返回上一页 </el-button>
       </div>
     </div>
   </div>
@@ -58,7 +52,7 @@ const goBack = () => {
     .error-title {
       font-size: 72px;
       font-weight: bold;
-      color: #409EFF;
+      color: #409eff;
       margin: 0 0 20px;
       line-height: 1;
     }
@@ -85,7 +79,8 @@ const goBack = () => {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

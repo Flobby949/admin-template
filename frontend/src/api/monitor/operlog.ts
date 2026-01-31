@@ -6,20 +6,20 @@ import type { PageResult } from '@/api/user'
  */
 export interface OperLogVO {
   id: number
-  title: string        // Module Name
+  title: string // Module Name
   businessType: number // 0:Other, 1:Insert, 2:Update, 3:Delete, 4:Grant, 5:Export, 6:Import, 7:Force, 8:GenCode, 9:Clean
-  method: string       // Class + Method name
+  method: string // Class + Method name
   requestMethod: string // GET, POST, etc.
-  operName: string     // Operator Username
+  operName: string // Operator Username
   operUrl: string
   operIp: string
   operLocation: string
-  operParam: string    // Request Params (JSON string)
-  jsonResult: string   // Response (JSON string)
-  status: number       // 1:Success, 0:Fail
+  operParam: string // Request Params (JSON string)
+  jsonResult: string // Response (JSON string)
+  status: number // 1:Success, 0:Fail
   errorMsg: string
   operTime: string
-  costTime: number     // Time consumed (ms)
+  costTime: number // Time consumed (ms)
 }
 
 /**
@@ -43,7 +43,7 @@ export function getOperLogList(query: OperLogQuery) {
     url: '/monitor/operation-logs',
     method: 'get',
     params: {
-      ...query,
+      ...query
       // Handle array params if backend expects simplified format or ensure axios serializes correctly
       // Typically axios serializes arrays as operTime[]=...&operTime[]=...
       // If backend needs comma separated: operTime: query.operTime?.join(',')

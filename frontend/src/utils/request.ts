@@ -1,7 +1,5 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { ElMessage } from 'element-plus'
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { getToken } from '@/utils/auth'
-import 'element-plus/theme-chalk/el-message.css'
 
 // Create axios instance
 const service = axios.create({
@@ -19,7 +17,7 @@ service.interceptors.request.use(
     }
     return config
   },
-  (error: any) => {
+  (error: AxiosError) => {
     return Promise.reject(error)
   }
 )
@@ -28,7 +26,10 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response: AxiosResponse) => {
     // Handle binary data (blob, arraybuffer) - return raw response
-    if (response.request.responseType === 'blob' || response.request.responseType === 'arraybuffer') {
+    if (
+      response.request.responseType === 'blob' ||
+      response.request.responseType === 'arraybuffer'
+    ) {
       return response.data
     }
 
@@ -49,13 +50,14 @@ service.interceptors.response.use(
       return res.data
     }
   },
-  (error: any) => {
+  (error: AxiosError) => {
     console.error('err' + error) // for debug
 
     // 提取后端返回的错误消息
     let message = error.message
-    if (error.response && error.response.data && error.response.data.message) {
-      message = error.response.data.message
+    const responseData = error.response?.data as { message?: string } | undefined
+    if (responseData?.message) {
+      message = responseData.message
     }
 
     // 将错误消息附加到 error 对象上，供业务代码使用

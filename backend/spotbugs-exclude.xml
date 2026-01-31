@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude generated code -->
+    <Match>
+        <Class name="~.*Generated.*"/>
+    </Match>
+
+    <!-- Exclude test classes from certain checks -->
+    <Match>
+        <Class name="~.*Test"/>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+    </Match>
+
+    <!-- Exclude DTO/VO classes from serialization warnings -->
+    <Match>
+        <Or>
+            <Class name="~.*DTO"/>
+            <Class name="~.*VO"/>
+            <Class name="~.*Query"/>
+        </Or>
+        <Bug pattern="SE_BAD_FIELD"/>
+    </Match>
+
+    <!-- Exclude Lombok-generated equals/hashCode -->
+    <Match>
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+    </Match>
+
+    <!-- Exclude Spring-managed beans from unread field warnings -->
+    <Match>
+        <Or>
+            <Class name="~.*Service.*"/>
+            <Class name="~.*Controller.*"/>
+            <Class name="~.*Repository.*"/>
+        </Or>
+        <Bug pattern="URF_UNREAD_FIELD"/>
+    </Match>
+</FindBugsFilter>

@@ -29,7 +29,7 @@ export const permission: Directive = {
     })
 
     if (!hasPermission) {
-      el.parentNode && el.parentNode.removeChild(el)
+      el.parentNode?.removeChild(el)
     }
   }
 }

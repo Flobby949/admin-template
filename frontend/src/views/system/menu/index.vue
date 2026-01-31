@@ -84,12 +84,8 @@
         </el-table-column>
         <el-table-column label="操作" width="150" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">
-              编辑
-            </el-button>
-            <el-button type="danger" link @click="handleDelete(row)">
-              删除
-            </el-button>
+            <el-button type="primary" link @click="handleEdit(row)"> 编辑 </el-button>
+            <el-button type="danger" link @click="handleDelete(row)"> 删除 </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -200,15 +196,11 @@ const handleEdit = (row: MenuTreeVO) => {
 // 删除菜单
 const handleDelete = async (row: MenuTreeVO) => {
   try {
-    await ElMessageBox.confirm(
-      `确定要删除菜单"${row.menuName}"吗？`,
-      '删除确认',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(`确定要删除菜单"${row.menuName}"吗？`, '删除确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
 
     await deleteMenu(row.id)
     ElMessage.success('删除菜单成功')

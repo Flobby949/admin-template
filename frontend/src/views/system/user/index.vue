@@ -18,20 +18,20 @@
           </div>
           <div class="header-actions">
             <el-button
+              v-permission="'system:user:add'"
               type="primary"
               icon="Plus"
               @click="handleAdd"
-              v-permission="'system:user:add'"
             >
               新增用户
             </el-button>
             <el-button
+              v-permission="'system:user:remove'"
               type="danger"
               plain
               icon="Delete"
               :disabled="selectedIds.length === 0"
               @click="handleBatchDelete"
-              v-permission="'system:user:remove'"
             >
               批量删除
             </el-button>
@@ -68,7 +68,12 @@
                 />
               </el-form-item>
               <el-form-item label="状态">
-                <el-select v-model="queryForm.status" placeholder="全部状态" clearable style="width: 140px">
+                <el-select
+                  v-model="queryForm.status"
+                  placeholder="全部状态"
+                  clearable
+                  style="width: 140px"
+                >
                   <el-option label="启用" :value="1" />
                   <el-option label="禁用" :value="0" />
                 </el-select>
@@ -84,8 +89,8 @@
           <el-table
             v-loading="loading"
             :data="userList"
-            @selection-change="handleSelectionChange"
             class="modern-table"
+            @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="50" align="center" />
             <el-table-column label="用户ID" prop="id" width="80" align="center" />
@@ -97,12 +102,7 @@
             <el-table-column label="姓名" prop="realName" min-width="100" show-overflow-tooltip />
             <el-table-column label="部门" prop="depts" min-width="150" show-overflow-tooltip>
               <template #default="{ row }">
-                <el-tag
-                  v-for="dept in row.depts"
-                  :key="dept.id"
-                  size="small"
-                  class="dept-tag"
-                >
+                <el-tag v-for="dept in row.depts" :key="dept.id" size="small" class="dept-tag">
                   {{ dept.name }}
                 </el-tag>
                 <span v-if="!row.depts?.length" class="text-placeholder">-</span>
@@ -114,10 +114,10 @@
               <template #default="{ row }">
                 <el-switch
                   v-model="row.status"
+                  v-permission="'system:user:edit'"
                   :active-value="1"
                   :inactive-value="0"
                   @change="handleStatusChange(row)"
-                  v-permission="'system:user:edit'"
                 />
               </template>
             </el-table-column>
@@ -126,29 +126,29 @@
               <template #default="{ row }">
                 <div class="action-buttons">
                   <el-button
+                    v-permission="'system:user:edit'"
                     type="primary"
                     link
                     icon="Edit"
                     @click="handleEdit(row)"
-                    v-permission="'system:user:edit'"
                   >
                     编辑
                   </el-button>
                   <el-button
+                    v-permission="'system:user:resetPwd'"
                     type="primary"
                     link
                     icon="Key"
                     @click="handleResetPassword(row)"
-                    v-permission="'system:user:resetPwd'"
                   >
                     重置
                   </el-button>
                   <el-button
+                    v-permission="'system:user:remove'"
                     type="danger"
                     link
                     icon="Delete"
                     @click="handleDelete(row)"
-                    v-permission="'system:user:remove'"
                   >
                     删除
                   </el-button>
@@ -174,11 +174,7 @@
     </el-row>
 
     <!-- 用户对话框 -->
-    <UserDialog
-      v-model="dialogVisible"
-      :user-id="currentUserId"
-      @success="handleQuery"
-    />
+    <UserDialog v-model="dialogVisible" :user-id="currentUserId" @success="handleQuery" />
 
     <!-- 重置密码对话框 -->
     <el-dialog
@@ -187,7 +183,12 @@
       width="420px"
       :close-on-click-modal="false"
     >
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="90px">
+      <el-form
+        ref="passwordFormRef"
+        :model="passwordForm"
+        :rules="passwordRules"
+        label-width="90px"
+      >
         <el-form-item label="新密码" prop="newPassword">
           <el-input
             v-model="passwordForm.newPassword"
@@ -365,7 +366,7 @@ const handleResetPassword = (row: UserVO) => {
 // 确认重置密码
 const handleConfirmResetPassword = async () => {
   if (!passwordFormRef.value) return
-  await passwordFormRef.value.validate(async (valid) => {
+  await passwordFormRef.value.validate(async valid => {
     if (valid) {
       try {
         await resetPassword(passwordForm.userId, passwordForm.newPassword)

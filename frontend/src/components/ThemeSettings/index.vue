@@ -10,12 +10,7 @@
     </el-tooltip>
 
     <!-- 设置抽屉 -->
-    <el-drawer
-      v-model="drawerVisible"
-      title="主题设置"
-      direction="rtl"
-      size="320px"
-    >
+    <el-drawer v-model="drawerVisible" title="主题设置" direction="rtl" size="320px">
       <div class="settings-content">
         <!-- 深色模式切换 -->
         <div class="setting-section">
@@ -57,10 +52,7 @@
               :class="{ active: themeColor === colorKey }"
               @click="setThemeColor(colorKey as ThemeColor)"
             >
-              <div
-                class="color-preview"
-                :style="{ backgroundColor: colorInfo.primary }"
-              >
+              <div class="color-preview" :style="{ backgroundColor: colorInfo.primary }">
                 <el-icon v-if="themeColor === colorKey" color="#fff" :size="16">
                   <Check />
                 </el-icon>

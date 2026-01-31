@@ -74,7 +74,7 @@ class DataScopeTest {
         User user1 = new User();
         user1.setUsername("user1");
         user1.setPassword("password");
-        user1.setNickname("用户1");
+        user1.setRealName("用户1");
         user1.setStatus(1);
         user1.setDeleted(0);
         entityManager.persist(user1);
@@ -82,7 +82,7 @@ class DataScopeTest {
         User user2 = new User();
         user2.setUsername("user2");
         user2.setPassword("password");
-        user2.setNickname("用户2");
+        user2.setRealName("用户2");
         user2.setStatus(1);
         user2.setDeleted(0);
         entityManager.persist(user2);
@@ -90,7 +90,7 @@ class DataScopeTest {
         User user3 = new User();
         user3.setUsername("user3");
         user3.setPassword("password");
-        user3.setNickname("用户3");
+        user3.setRealName("用户3");
         user3.setStatus(1);
         user3.setDeleted(0);
         entityManager.persist(user3);

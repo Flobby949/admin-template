@@ -4,7 +4,13 @@
       <template #header>
         <div class="card-header">
           <span>操作日志</span>
-          <el-button type="danger" plain icon="Delete" @click="handleClean" v-permission="'monitor:operlog:remove'">
+          <el-button
+            v-permission="'monitor:operlog:remove'"
+            type="danger"
+            plain
+            icon="Delete"
+            @click="handleClean"
+          >
             清空日志
           </el-button>
         </div>
@@ -29,7 +35,12 @@
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 150px">
+          <el-select
+            v-model="queryParams.status"
+            placeholder="请选择状态"
+            clearable
+            style="width: 150px"
+          >
             <el-option label="成功" :value="1" />
             <el-option label="失败" :value="0" />
           </el-select>
@@ -49,7 +60,12 @@
         <el-form-item>
           <el-button type="primary" icon="Search" @click="handleQuery">查询</el-button>
           <el-button icon="Refresh" @click="handleReset">重置</el-button>
-          <el-button type="warning" icon="Download" @click="handleExport" v-permission="'monitor:operlog:export'">
+          <el-button
+            v-permission="'monitor:operlog:export'"
+            type="warning"
+            icon="Download"
+            @click="handleExport"
+          >
             导出
           </el-button>
         </el-form-item>
@@ -59,10 +75,10 @@
       <el-table
         v-loading="loading"
         :data="logList"
-        @selection-change="handleSelectionChange"
         border
         stripe
         style="width: 100%"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column prop="id" label="日志编号" width="80" align="center" />
@@ -86,13 +102,17 @@
         </el-table-column>
         <el-table-column prop="operTime" label="操作时间" min-width="180" align="center" />
         <el-table-column prop="costTime" label="消耗时间" width="100" align="center">
-          <template #default="{ row }">
-            {{ row.costTime }}ms
-          </template>
+          <template #default="{ row }"> {{ row.costTime }}ms </template>
         </el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link icon="View" @click="handleDetail(row)" v-permission="'monitor:operlog:query'">
+            <el-button
+              v-permission="'monitor:operlog:query'"
+              type="primary"
+              link
+              icon="View"
+              @click="handleDetail(row)"
+            >
               详情
             </el-button>
           </template>
@@ -225,22 +245,26 @@ const handleClean = () => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    try {
-      await cleanOperLog()
-      ElMessage.success('清空成功')
-      handleQuery()
-    } catch (error) {
-      ElMessage.error('清空失败')
-    }
-  }).catch(() => {})
+  })
+    .then(async () => {
+      try {
+        await cleanOperLog()
+        ElMessage.success('清空成功')
+        handleQuery()
+      } catch (error) {
+        ElMessage.error('清空失败')
+      }
+    })
+    .catch(() => {})
 }
 
 // 导出日志
 const handleExport = async () => {
   try {
     const res = await exportOperLog(queryParams)
-    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const blob = new Blob([res], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
     const link = document.createElement('a')
     link.href = window.URL.createObjectURL(blob)
     link.download = `operation_logs_${new Date().getTime()}.xlsx`

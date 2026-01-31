@@ -6,12 +6,7 @@
     @update:model-value="handleUpdateModelValue"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="上级部门" prop="parentId">
         <el-tree-select
           v-model="form.parentId"
@@ -49,7 +44,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="loading">确 定</el-button>
+        <el-button type="primary" :loading="loading" @click="handleSubmit">确 定</el-button>
       </div>
     </template>
   </el-dialog>
@@ -58,7 +53,14 @@
 <script setup lang="ts">
 import { ref, reactive, watch, toRefs } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { getDeptTree, getDept, addDept, updateDept, type DeptForm, type DeptVO } from '@/api/system/dept'
+import {
+  getDeptTree,
+  getDept,
+  addDept,
+  updateDept,
+  type DeptForm,
+  type DeptVO
+} from '@/api/system/dept'
 
 const props = defineProps<{
   modelValue: boolean
@@ -94,7 +96,9 @@ const rules: FormRules = {
   deptName: [{ required: true, message: '请输入部门名称', trigger: 'blur' }],
   sortOrder: [{ required: true, message: '请输入显示排序', trigger: 'blur' }],
   email: [{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
-  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: ['blur', 'change'] }]
+  phone: [
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: ['blur', 'change'] }
+  ]
 }
 
 // Reset form
@@ -111,24 +115,27 @@ const reset = () => {
 }
 
 // Handle dialog open
-watch(() => props.modelValue, async (val) => {
-  if (val) {
-    reset()
-    await getTreeselect()
-    if (props.isEdit && props.deptId) {
-      await loadDept(props.deptId)
-    } else if (props.parentId) {
-      form.parentId = props.parentId
+watch(
+  () => props.modelValue,
+  async val => {
+    if (val) {
+      reset()
+      await getTreeselect()
+      if (props.isEdit && props.deptId) {
+        await loadDept(props.deptId)
+      } else if (props.parentId) {
+        form.parentId = props.parentId
+      }
     }
   }
-})
+)
 
 // Get Dept Tree for Select
 const getTreeselect = async () => {
   try {
     const data = await getDeptTree()
     deptOptions.value = [{ id: 0, deptName: '顶级部门', children: [] } as any].concat(data)
-    
+
     // If editing, disable current node and children to prevent cycle
     if (props.isEdit && props.deptId) {
       disableDeptTree(deptOptions.value, props.deptId)
@@ -181,7 +188,7 @@ const handleClose = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
+  await formRef.value.validate(async valid => {
     if (valid) {
       loading.value = true
       try {

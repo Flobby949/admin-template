@@ -8,22 +8,12 @@
     @open="handleOpen"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      label-width="100px"
-      v-loading="loading"
-    >
+    <el-form ref="formRef" v-loading="loading" :model="formData" :rules="rules" label-width="100px">
       <el-form-item label="角色名称" prop="roleName">
         <el-input v-model="formData.roleName" placeholder="请输入角色名称" />
       </el-form-item>
       <el-form-item label="角色编码" prop="roleCode">
-        <el-input
-          v-model="formData.roleCode"
-          placeholder="请输入角色编码"
-          :disabled="!!roleId"
-        />
+        <el-input v-model="formData.roleCode" placeholder="请输入角色编码" :disabled="!!roleId" />
       </el-form-item>
       <el-form-item label="数据权限" prop="dataScope">
         <DataScopeSelect v-model="formData.dataScope" />
@@ -35,26 +25,15 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="菜单权限" prop="menuIds">
-        <MenuTree
-          ref="menuTreeRef"
-          v-model="selectedMenuIds"
-          :menu-tree="menuTree"
-        />
+        <MenuTree ref="menuTreeRef" v-model="selectedMenuIds" :menu-tree="menuTree" />
       </el-form-item>
       <el-form-item label="备注" prop="remark">
-        <el-input
-          v-model="formData.remark"
-          type="textarea"
-          :rows="3"
-          placeholder="请输入备注"
-        />
+        <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" />
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="$emit('update:visible', false)">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="handleSubmit">
-        确定
-      </el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSubmit"> 确定 </el-button>
     </template>
   </el-dialog>
 </template>

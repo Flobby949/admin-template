@@ -14,7 +14,38 @@ export default defineFlatConfig([
     languageOptions: {
       globals: {
         console: 'readonly',
-        process: 'readonly'
+        process: 'readonly',
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        Blob: 'readonly',
+        URL: 'readonly',
+        HTMLElement: 'readonly',
+        Element: 'readonly',
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        FormData: 'readonly',
+        File: 'readonly',
+        FileReader: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
+        MutationObserver: 'readonly',
+        ResizeObserver: 'readonly',
+        IntersectionObserver: 'readonly',
+        navigator: 'readonly',
+        location: 'readonly',
+        history: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly'
       }
     }
   },
@@ -41,7 +72,10 @@ export default defineFlatConfig([
       ...pluginVue.configs['vue3-essential'].rules,
       ...pluginVue.configs['vue3-strongly-recommended'].rules,
       ...pluginVue.configs['vue3-recommended'].rules,
-      'vue/multi-word-component-names': 'off'
+      'vue/multi-word-component-names': 'off',
+      'vue/no-template-shadow': 'warn',
+      // Allow unused vars in Vue emit interface definitions
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_|^e$|^event$|^value$|^error$', varsIgnorePattern: '^_|^props$' }]
     }
   },
   {
@@ -59,7 +93,8 @@ export default defineFlatConfig([
     rules: {
       ...pluginTypeScript.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn'
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
     }
   },
   {

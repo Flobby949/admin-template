@@ -59,7 +59,7 @@ export const useUserStore = defineStore('user', {
 
     // Remove token
     resetToken() {
-      return new Promise<void>((resolve) => {
+      return new Promise<void>(resolve => {
         this.token = ''
         this.roles = []
         removeToken()

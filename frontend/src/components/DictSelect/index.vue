@@ -12,7 +12,7 @@
       :key="item.dictValue"
       :label="item.dictLabel"
       :value="item.dictValue"
-      :disabled="item.status === '0'" 
+      :disabled="item.status === '0'"
     />
   </el-select>
 </template>
@@ -56,7 +56,7 @@ const options = ref<DictDataVO[]>([])
 
 const modelValueComputed = computed({
   get: () => props.modelValue,
-  set: (val) => {
+  set: val => {
     emit('update:modelValue', val)
     emit('change', val)
   }
@@ -69,11 +69,14 @@ onMounted(async () => {
 })
 
 // watch dictType in case it changes
-watch(() => props.dictType, async (newVal) => {
-  if (newVal) {
-    options.value = await dictStore.getDict(newVal)
-  } else {
-    options.value = []
+watch(
+  () => props.dictType,
+  async newVal => {
+    if (newVal) {
+      options.value = await dictStore.getDict(newVal)
+    } else {
+      options.value = []
+    }
   }
-})
+)
 </script>

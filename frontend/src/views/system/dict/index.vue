@@ -5,14 +5,16 @@
         <div class="card-header">
           <span>字典管理</span>
           <div class="right-menu">
-            <el-button type="danger" plain icon="Refresh" @click="handleRefreshCache">刷新缓存</el-button>
+            <el-button type="danger" plain icon="Refresh" @click="handleRefreshCache"
+              >刷新缓存</el-button
+            >
             <el-button type="primary" icon="Plus" @click="handleAdd">新增字典</el-button>
           </div>
         </div>
       </template>
 
       <!-- 搜索表单 -->
-      <el-form :inline="true" :model="queryParams" ref="queryFormRef" class="search-form">
+      <el-form ref="queryFormRef" :inline="true" :model="queryParams" class="search-form">
         <el-form-item label="字典名称" prop="dictName">
           <el-input
             v-model="queryParams.dictName"
@@ -30,7 +32,12 @@
           />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="queryParams.status" placeholder="字典状态" clearable style="width: 200px">
+          <el-select
+            v-model="queryParams.status"
+            placeholder="字典状态"
+            clearable
+            style="width: 200px"
+          >
             <el-option label="正常" :value="1" />
             <el-option label="停用" :value="0" />
           </el-select>
@@ -42,12 +49,7 @@
       </el-form>
 
       <!-- 数据表格 -->
-      <el-table
-        v-loading="loading"
-        :data="typeList"
-        border
-        stripe
-      >
+      <el-table v-loading="loading" :data="typeList" border stripe>
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="dictName" label="字典名称" show-overflow-tooltip />
         <el-table-column prop="dictType" label="字典类型" show-overflow-tooltip>
@@ -90,7 +92,7 @@
       </div>
 
       <!-- 添加或修改字典对话框 -->
-      <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+      <el-dialog v-model="open" :title="title" width="500px" append-to-body>
         <el-form ref="dictFormRef" :model="form" :rules="rules" label-width="80px">
           <el-form-item label="字典名称" prop="dictName">
             <el-input v-model="form.dictName" placeholder="请输入字典名称" />
@@ -123,7 +125,16 @@
 import { ref, reactive, onMounted, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, FormInstance } from 'element-plus'
-import { listType, getType, addType, updateType, delType, refreshCache, DictTypeVO, DictTypeQuery } from '@/api/system/dict/type'
+import {
+  listType,
+  getType,
+  addType,
+  updateType,
+  delType,
+  refreshCache,
+  DictTypeVO,
+  DictTypeQuery
+} from '@/api/system/dict/type'
 
 const router = useRouter()
 const dictFormRef = ref<FormInstance>()
@@ -219,12 +230,15 @@ function handleDelete(row: DictTypeVO) {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    return delType(row.id)
-  }).then(() => {
-    handleQuery()
-    ElMessage.success('删除成功')
-  }).catch(() => {})
+  })
+    .then(() => {
+      return delType(row.id)
+    })
+    .then(() => {
+      handleQuery()
+      ElMessage.success('删除成功')
+    })
+    .catch(() => {})
 }
 
 /** 刷新缓存按钮操作 */
@@ -270,7 +284,7 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .right-menu {
     display: flex;
     gap: 10px;
@@ -281,11 +295,11 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
   }
-  
+
   .link-type {
     color: var(--el-color-primary);
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }

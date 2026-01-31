@@ -1,21 +1,9 @@
 <template>
   <div class="menu-tree-container">
     <div class="tree-header">
-      <el-checkbox
-        v-model="expandAll"
-        @change="handleExpandAll"
-      >
-        展开/折叠
-      </el-checkbox>
-      <el-checkbox
-        v-model="checkAll"
-        @change="handleCheckAll"
-      >
-        全选/全不选
-      </el-checkbox>
-      <el-checkbox v-model="checkStrictly">
-        联动子节点
-      </el-checkbox>
+      <el-checkbox v-model="expandAll" @change="handleExpandAll"> 展开/折叠 </el-checkbox>
+      <el-checkbox v-model="checkAll" @change="handleCheckAll"> 全选/全不选 </el-checkbox>
+      <el-checkbox v-model="checkStrictly"> 联动子节点 </el-checkbox>
     </div>
     <el-tree
       ref="treeRef"
@@ -34,12 +22,7 @@
             <component :is="getIconComponent(data.icon)" />
           </el-icon>
           <span>{{ node.label }}</span>
-          <el-tag
-            v-if="data.menuType === 3"
-            type="info"
-            size="small"
-            class="node-tag"
-          >
+          <el-tag v-if="data.menuType === 3" type="info" size="small" class="node-tag">
             按钮
           </el-tag>
         </span>
@@ -263,7 +246,7 @@ const setCheckedKeys = (keys: number[]) => {
 // 监听 modelValue 变化
 watch(
   () => props.modelValue,
-  (val) => {
+  val => {
     if (val && val.length > 0) {
       setCheckedKeys(val)
     }

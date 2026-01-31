@@ -3,9 +3,9 @@
     <!-- 数据权限范围选择 -->
     <el-select
       :model-value="modelValue"
-      @update:model-value="handleScopeChange"
       placeholder="请选择数据权限范围"
       style="width: 100%"
+      @update:model-value="handleScopeChange"
     >
       <el-option
         v-for="item in scopeOptions"

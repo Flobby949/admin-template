@@ -116,8 +116,8 @@ export interface RoleForm {
 
 export interface RoleVO {
   id: number
-  name: string  // 改为 name 以匹配 UserVO.RoleInfo
-  code: string  // 改为 code 以匹配 UserVO.RoleInfo
+  name: string // 改为 name 以匹配 UserVO.RoleInfo
+  code: string // 改为 code 以匹配 UserVO.RoleInfo
   roleName: string
   roleCode: string
   dataScope: number

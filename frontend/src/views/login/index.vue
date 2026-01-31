@@ -23,19 +23,15 @@
         </div>
 
         <el-form
+          ref="loginFormRef"
           :model="loginForm"
           :rules="loginRules"
-          ref="loginFormRef"
           label-position="top"
           size="large"
           class="login-form"
         >
           <el-form-item label="用户名" prop="username">
-            <el-input
-              v-model="loginForm.username"
-              placeholder="请输入用户名"
-              :prefix-icon="User"
-            />
+            <el-input v-model="loginForm.username" placeholder="请输入用户名" :prefix-icon="User" />
           </el-form-item>
 
           <el-form-item label="密码" prop="password">
@@ -50,12 +46,7 @@
           </el-form-item>
 
           <el-form-item class="login-actions">
-            <el-button
-              type="primary"
-              :loading="loading"
-              class="login-button"
-              @click="handleLogin"
-            >
+            <el-button type="primary" :loading="loading" class="login-button" @click="handleLogin">
               {{ loading ? '登录中...' : '登 录' }}
             </el-button>
           </el-form-item>
@@ -97,13 +88,13 @@ const loginRules = reactive<FormRules>({
 
 const handleLogin = async () => {
   if (!loginFormRef.value) return
-  await loginFormRef.value.validate(async (valid) => {
+  await loginFormRef.value.validate(async valid => {
     if (valid) {
       loading.value = true
       try {
         await userStore.login(loginForm)
         ElMessage.success('登录成功')
-        const redirect = route.query.redirect as string || '/'
+        const redirect = (route.query.redirect as string) || '/'
         router.push(redirect)
       } catch (error: any) {
         ElMessage.error(error.message || '登录失败')

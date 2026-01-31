@@ -5,44 +5,21 @@
     width="600px"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="用户名" prop="username">
-        <el-input
-          v-model="form.username"
-          placeholder="请输入用户名"
-          :disabled="isEdit"
-        />
+        <el-input v-model="form.username" placeholder="请输入用户名" :disabled="isEdit" />
       </el-form-item>
-      <el-form-item label="密码" prop="password" v-if="!isEdit">
-        <el-input
-          v-model="form.password"
-          type="password"
-          placeholder="请输入密码"
-          show-password
-        />
+      <el-form-item v-if="!isEdit" label="密码" prop="password">
+        <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
       </el-form-item>
       <el-form-item label="姓名" prop="realName">
-        <el-input
-          v-model="form.realName"
-          placeholder="请输入姓名"
-        />
+        <el-input v-model="form.realName" placeholder="请输入姓名" />
       </el-form-item>
       <el-form-item label="邮箱" prop="email">
-        <el-input
-          v-model="form.email"
-          placeholder="请输入邮箱"
-        />
+        <el-input v-model="form.email" placeholder="请输入邮箱" />
       </el-form-item>
       <el-form-item label="手机号" prop="phone">
-        <el-input
-          v-model="form.phone"
-          placeholder="请输入手机号"
-        />
+        <el-input v-model="form.phone" placeholder="请输入手机号" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="form.status">
@@ -64,12 +41,7 @@
         />
       </el-form-item>
       <el-form-item label="角色" prop="roleIds">
-        <el-select
-          v-model="form.roleIds"
-          multiple
-          placeholder="请选择角色"
-          style="width: 100%"
-        >
+        <el-select v-model="form.roleIds" multiple placeholder="请选择角色" style="width: 100%">
           <el-option
             v-for="role in roleList"
             :key="role.id"
@@ -79,19 +51,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
-        <el-input
-          v-model="form.remark"
-          type="textarea"
-          :rows="3"
-          placeholder="请输入备注"
-        />
+        <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" @click="handleSubmit" :loading="submitting">
-        确定
-      </el-button>
+      <el-button type="primary" :loading="submitting" @click="handleSubmit"> 确定 </el-button>
     </template>
   </el-dialog>
 </template>
@@ -118,7 +83,7 @@ const emit = defineEmits<Emits>()
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value)
 })
 
 const isEdit = computed(() => !!props.userId)
@@ -137,20 +102,20 @@ const form = reactive<UserDTO>({
   deptIds: [], // Keep array if backend supports multiple, but usually user belongs to one main dept.
   remark: ''
 })
-// Usually `deptId` (single) is better for primary department. 
+// Usually `deptId` (single) is better for primary department.
 // However, UserDTO interface in `src/api/user.ts` has `deptIds?: number[]`.
 // Let's assume for now we select one department but store it in array or handle accordingly.
-// Wait, standard RBAC often has one Dept per user. 
+// Wait, standard RBAC often has one Dept per user.
 // Let's check `src/api/user.ts` again. It has `deptIds?: number[]`.
 // And `UserVO` has `depts?: DeptInfo[]`.
-// If the backend supports multiple departments, we should use multiple select. 
+// If the backend supports multiple departments, we should use multiple select.
 // But the prompt says "Department Selection" and usually it's single in basic implementations.
 // Let's stick to the interface. I will add `deptId` to form if I need single select, or use `deptIds` for multiple.
-// Given `UserDTO` has `deptIds`, I'll use that. 
-// But typically users have one primary department. 
-// I will check standard implementations. 
+// Given `UserDTO` has `deptIds`, I'll use that.
+// But typically users have one primary department.
+// I will check standard implementations.
 // If I use `deptIds`, I should use `multiple` in tree-select.
-// However, the `DeptTree` on the left implies a single hierarchy. 
+// However, the `DeptTree` on the left implies a single hierarchy.
 // I will assume single selection for simplicity and main organization structure, unless `deptIds` forces me.
 // Actually, I'll modify `form` to use `deptIds` as array for compatibility.
 
@@ -166,7 +131,7 @@ const submitting = ref(false)
 const loadRoleList = async () => {
   try {
     const data = await getRoleList({ pageNum: 1, pageSize: 100 })
-    roleList.value = Array.isArray(data) ? data : (data.list || [])
+    roleList.value = Array.isArray(data) ? data : data.list || []
   } catch (error) {
     ElMessage.error('加载角色列表失败')
   }
@@ -221,7 +186,7 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
+  await formRef.value.validate(async valid => {
     if (valid) {
       submitting.value = true
       try {
@@ -256,7 +221,7 @@ const handleClose = () => {
 }
 
 // 监听对话框打开
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     loadRoleList()
     loadDeptTree()

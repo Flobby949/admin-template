@@ -1,11 +1,5 @@
 <template>
-  <el-drawer
-    v-model="visible"
-    title="操作日志详情"
-    direction="rtl"
-    size="50%"
-    destroy-on-close
-  >
+  <el-drawer v-model="visible" title="操作日志详情" direction="rtl" size="50%" destroy-on-close>
     <el-descriptions :column="1" border>
       <el-descriptions-item label="操作模块">
         {{ data.title }} / {{ getBusinessTypeName(data.businessType) }}
@@ -54,13 +48,11 @@
         <div v-if="data.status === 1">正常</div>
         <div v-else class="text-danger">失败</div>
       </el-descriptions-item>
-      <el-descriptions-item label="消耗时间">
-        {{ data.costTime }}ms
-      </el-descriptions-item>
+      <el-descriptions-item label="消耗时间"> {{ data.costTime }}ms </el-descriptions-item>
       <el-descriptions-item label="操作时间">
         {{ data.operTime }}
       </el-descriptions-item>
-      <el-descriptions-item label="异常信息" v-if="data.status === 0">
+      <el-descriptions-item v-if="data.status === 0" label="异常信息">
         <div class="code-box error-box">
           {{ data.errorMsg }}
         </div>
@@ -88,7 +80,7 @@ const { copy, isSupported } = useClipboard()
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 const getBusinessTypeName = (type: number) => {

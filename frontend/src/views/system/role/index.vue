@@ -89,11 +89,7 @@
     </el-card>
 
     <!-- 新增/编辑对话框 -->
-    <RoleDialog
-      v-model:visible="dialogVisible"
-      :role-id="currentRoleId"
-      @success="handleSuccess"
-    />
+    <RoleDialog v-model:visible="dialogVisible" :role-id="currentRoleId" @success="handleSuccess" />
   </div>
 </template>
 
@@ -137,14 +133,10 @@ const fetchRoleList = async () => {
 
     // 前端过滤
     if (queryParams.roleName) {
-      list = list.filter((item: RoleVO) =>
-        item.roleName.includes(queryParams.roleName)
-      )
+      list = list.filter((item: RoleVO) => item.roleName.includes(queryParams.roleName))
     }
     if (queryParams.roleCode) {
-      list = list.filter((item: RoleVO) =>
-        item.roleCode.includes(queryParams.roleCode)
-      )
+      list = list.filter((item: RoleVO) => item.roleCode.includes(queryParams.roleCode))
     }
     if (queryParams.status !== undefined) {
       list = list.filter((item: RoleVO) => item.status === queryParams.status)
@@ -186,15 +178,11 @@ const handleEdit = (row: RoleVO) => {
 // 删除
 const handleDelete = async (row: RoleVO) => {
   try {
-    await ElMessageBox.confirm(
-      `确定要删除角色"${row.roleName}"吗？`,
-      '提示',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(`确定要删除角色"${row.roleName}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
     await deleteRole(row.id)
     ElMessage.success('删除成功')
     fetchRoleList()

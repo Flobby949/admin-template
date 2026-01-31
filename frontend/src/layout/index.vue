@@ -2,11 +2,7 @@
   <div class="common-layout">
     <el-container>
       <!-- 移动端遮罩层 -->
-      <div
-        v-if="isMobile && !isCollapsed"
-        class="sidebar-overlay"
-        @click="toggleSidebar"
-      />
+      <div v-if="isMobile && !isCollapsed" class="sidebar-overlay" @click="toggleSidebar" />
 
       <el-aside
         :width="sidebarWidth"
@@ -50,8 +46,8 @@
             <el-button
               class="hamburger-btn"
               :icon="isCollapsed ? Expand : Fold"
-              @click="toggleSidebar"
               text
+              @click="toggleSidebar"
             />
             <h3 class="page-title">{{ currentRouteName }}</h3>
           </div>
@@ -103,7 +99,15 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
 import { usePermissionStore } from '@/stores/permission'
-import { HomeFilled, ElementPlus, ArrowDown, Lock, SwitchButton, Fold, Expand } from '@element-plus/icons-vue'
+import {
+  HomeFilled,
+  ElementPlus,
+  ArrowDown,
+  Lock,
+  SwitchButton,
+  Fold,
+  Expand
+} from '@element-plus/icons-vue'
 import SidebarItem from './components/SidebarItem.vue'
 import ThemeToggle from '@/components/ThemeToggle/index.vue'
 import ThemeSettings from '@/components/ThemeSettings/index.vue'

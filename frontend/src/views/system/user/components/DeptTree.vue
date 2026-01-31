@@ -72,7 +72,7 @@ const handleNodeClick = (data: DeptVO) => {
   emit('node-click', data.id)
 }
 
-watch(deptName, (val) => {
+watch(deptName, val => {
   treeRef.value?.filter(val)
 })
 

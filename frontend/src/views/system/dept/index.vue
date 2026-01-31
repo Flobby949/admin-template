@@ -4,7 +4,13 @@
       <template #header>
         <div class="card-header">
           <span>部门管理</span>
-          <el-button type="primary" plain icon="Plus" @click="handleAdd()" v-permission="'system:dept:add'">
+          <el-button
+            v-permission="'system:dept:add'"
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd()"
+          >
             新增部门
           </el-button>
         </div>
@@ -21,7 +27,12 @@
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 200px">
+          <el-select
+            v-model="queryParams.status"
+            placeholder="请选择状态"
+            clearable
+            style="width: 200px"
+          >
             <el-option label="正常" :value="1" />
             <el-option label="停用" :value="0" />
           </el-select>
@@ -49,10 +60,10 @@
           <template #default="{ row }">
             <el-switch
               v-model="row.status"
+              v-permission="'system:dept:edit'"
               :active-value="1"
               :inactive-value="0"
               @change="handleStatusChange(row)"
-              v-permission="'system:dept:edit'"
             />
           </template>
         </el-table-column>
@@ -62,13 +73,31 @@
         <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
         <el-table-column label="操作" width="220" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link icon="Edit" @click="handleEdit(row)" v-permission="'system:dept:edit'">
+            <el-button
+              v-permission="'system:dept:edit'"
+              type="primary"
+              link
+              icon="Edit"
+              @click="handleEdit(row)"
+            >
               编辑
             </el-button>
-            <el-button type="primary" link icon="Plus" @click="handleAdd(row)" v-permission="'system:dept:add'">
+            <el-button
+              v-permission="'system:dept:add'"
+              type="primary"
+              link
+              icon="Plus"
+              @click="handleAdd(row)"
+            >
               新增
             </el-button>
-            <el-button type="danger" link icon="Delete" @click="handleDelete(row)" v-permission="'system:dept:remove'">
+            <el-button
+              v-permission="'system:dept:remove'"
+              type="danger"
+              link
+              icon="Delete"
+              @click="handleDelete(row)"
+            >
               删除
             </el-button>
           </template>
@@ -91,7 +120,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getDeptTree, delDept, changeDeptStatus, type DeptVO, type DeptQuery } from '@/api/system/dept'
+import {
+  getDeptTree,
+  delDept,
+  changeDeptStatus,
+  type DeptVO,
+  type DeptQuery
+} from '@/api/system/dept'
 import DeptDialog from './components/DeptDialog.vue'
 
 // 查询参数
@@ -156,35 +191,37 @@ const handleDelete = (row: DeptVO) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    try {
-      await delDept(row.id)
-      ElMessage.success('删除成功')
-      handleQuery()
-    } catch (error) {
-      ElMessage.error('删除失败')
-    }
-  }).catch(() => {})
+  })
+    .then(async () => {
+      try {
+        await delDept(row.id)
+        ElMessage.success('删除成功')
+        handleQuery()
+      } catch (error) {
+        ElMessage.error('删除失败')
+      }
+    })
+    .catch(() => {})
 }
 
 // 修改部门状态
 const handleStatusChange = async (row: DeptVO) => {
   const text = row.status === 0 ? '停用' : '启用'
   const hasChildren = row.children && row.children.length > 0
-  
+
   try {
     if (row.status === 0) {
-      const warningMsg = hasChildren 
+      const warningMsg = hasChildren
         ? `该部门包含子部门，停用将导致所有子部门及关联用户无法访问，是否确认？`
         : `确认要"${text}""${row.deptName}"吗？`
-        
-      await ElMessageBox.confirm(warningMsg, '系统提示', { 
+
+      await ElMessageBox.confirm(warningMsg, '系统提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning' 
+        type: 'warning'
       })
     }
-    
+
     await changeDeptStatus(row.id, row.status)
     ElMessage.success(`${text}成功`)
     handleQuery()

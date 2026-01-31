@@ -1,16 +1,6 @@
 <template>
-  <el-dialog
-    v-model="visible"
-    title="修改密码"
-    width="400px"
-    @close="handleClose"
-  >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="80px"
-    >
+  <el-dialog v-model="visible" title="修改密码" width="400px" @close="handleClose">
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
       <el-form-item label="原密码" prop="oldPassword">
         <el-input
           v-model="form.oldPassword"
@@ -38,9 +28,7 @@
     </el-form>
     <template #footer>
       <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">
-        确定
-      </el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit"> 确定 </el-button>
     </template>
   </el-dialog>
 </template>
@@ -55,7 +43,7 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: boolean): void
+  (event: 'update:modelValue', value: boolean): void
 }
 
 const props = defineProps<Props>()
@@ -63,7 +51,7 @@ const emit = defineEmits<Emits>()
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value)
 })
 
 const formRef = ref<FormInstance>()
@@ -84,9 +72,7 @@ const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
 }
 
 const rules: FormRules = {
-  oldPassword: [
-    { required: true, message: '请输入原密码', trigger: 'blur' }
-  ],
+  oldPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
   newPassword: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
     { min: 6, max: 20, message: '密码长度必须在6-20个字符之间', trigger: 'blur' }

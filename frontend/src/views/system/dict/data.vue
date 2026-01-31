@@ -5,14 +5,16 @@
         <div class="card-header">
           <div class="header-title">
             <el-button link icon="ArrowLeft" @click="handleClose">返回</el-button>
-            <span style="margin-left: 10px; font-weight: bold;">字典数据 - {{ currentDictType?.dictName }} ({{ currentDictType?.dictType }})</span>
+            <span style="margin-left: 10px; font-weight: bold"
+              >字典数据 - {{ currentDictType?.dictName }} ({{ currentDictType?.dictType }})</span
+            >
           </div>
           <el-button type="primary" icon="Plus" @click="handleAdd">新增数据</el-button>
         </div>
       </template>
 
       <!-- 搜索表单 -->
-      <el-form :inline="true" :model="queryParams" ref="queryFormRef" class="search-form">
+      <el-form ref="queryFormRef" :inline="true" :model="queryParams" class="search-form">
         <el-form-item label="字典标签" prop="dictLabel">
           <el-input
             v-model="queryParams.dictLabel"
@@ -34,12 +36,7 @@
       </el-form>
 
       <!-- 数据表格 -->
-      <el-table
-        v-loading="loading"
-        :data="dataList"
-        border
-        stripe
-      >
+      <el-table v-loading="loading" :data="dataList" border stripe>
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="dictLabel" label="字典标签">
           <template #default="{ row }">
@@ -80,7 +77,7 @@
       </div>
 
       <!-- 添加或修改字典数据对话框 -->
-      <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+      <el-dialog v-model="open" :title="title" width="500px" append-to-body>
         <el-form ref="dictFormRef" :model="form" :rules="rules" label-width="80px">
           <el-form-item label="字典类型">
             <el-input v-model="form.dictType" disabled />
@@ -104,7 +101,9 @@
               >
                 <span style="float: left">{{ item.label }}</span>
                 <span style="float: right; color: #8492a6; font-size: 13px">
-                   <el-tag :type="item.value === 'default' ? '' : item.value as any">{{ item.label }}</el-tag>
+                  <el-tag :type="item.value === 'default' ? '' : (item.value as any)">{{
+                    item.label
+                  }}</el-tag>
                 </span>
               </el-option>
             </el-select>
@@ -137,7 +136,15 @@
 import { ref, reactive, onMounted, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, FormInstance } from 'element-plus'
-import { listData, getData, addData, updateData, delData, DictDataVO, DictDataQuery } from '@/api/system/dict/data'
+import {
+  listData,
+  getData,
+  addData,
+  updateData,
+  delData,
+  DictDataVO,
+  DictDataQuery
+} from '@/api/system/dict/data'
 import { getType, DictTypeVO } from '@/api/system/dict/type'
 import useDictStore from '@/stores/dict'
 import DictTag from '@/components/DictTag/index.vue'
@@ -274,13 +281,16 @@ function handleDelete(row: DictDataVO) {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    return delData(row.id)
-  }).then(() => {
-    dictStore.removeDict(row.dictType)
-    handleQuery()
-    ElMessage.success('删除成功')
-  }).catch(() => {})
+  })
+    .then(() => {
+      return delData(row.id)
+    })
+    .then(() => {
+      dictStore.removeDict(row.dictType)
+      handleQuery()
+      ElMessage.success('删除成功')
+    })
+    .catch(() => {})
 }
 
 /** 返回按钮 */
@@ -323,7 +333,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .header-title {
       display: flex;
       align-items: center;

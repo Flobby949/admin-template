@@ -7,26 +7,29 @@ const THEME_KEY = 'app-theme'
 const THEME_COLOR_KEY = 'app-theme-color'
 
 // 预设主题色方案（包含 Element Plus 所需的所有变体）
-export const themeColors: Record<ThemeColor, {
-  name: string
-  primary: string
-  hover: string
-  light: string
-  // Element Plus 颜色变体（浅色模式）
-  light3: string
-  light5: string
-  light7: string
-  light8: string
-  light9: string
-  dark2: string
-  // 深色模式专用变体
-  darkMode: string
-  darkLight3: string  // 深色模式下的 light-3
-  darkLight5: string  // 深色模式下的 light-5
-  darkLight7: string  // 深色模式下的 light-7
-  darkLight8: string  // 深色模式下的 light-8
-  darkLight9: string  // 深色模式下的 light-9
-}> = {
+export const themeColors: Record<
+  ThemeColor,
+  {
+    name: string
+    primary: string
+    hover: string
+    light: string
+    // Element Plus 颜色变体（浅色模式）
+    light3: string
+    light5: string
+    light7: string
+    light8: string
+    light9: string
+    dark2: string
+    // 深色模式专用变体
+    darkMode: string
+    darkLight3: string // 深色模式下的 light-3
+    darkLight5: string // 深色模式下的 light-5
+    darkLight7: string // 深色模式下的 light-7
+    darkLight8: string // 深色模式下的 light-8
+    darkLight9: string // 深色模式下的 light-9
+  }
+> = {
   blue: {
     name: '科技蓝',
     primary: '#2563EB',
@@ -43,7 +46,7 @@ export const themeColors: Record<ThemeColor, {
     darkLight5: '#1E40AF',
     darkLight7: '#1D4ED8',
     darkLight8: '#2563EB',
-    darkLight9: '#2D3B52'  // 比 Slate 800 (#1E293B) 稍亮，用于悬浮/选中
+    darkLight9: '#2D3B52' // 比 Slate 800 (#1E293B) 稍亮，用于悬浮/选中
   },
   green: {
     name: '自然绿',

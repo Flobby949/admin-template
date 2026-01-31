@@ -13,6 +13,8 @@ import org.springframework.util.StringUtils;
 import top.flobby.admin.common.annotation.DataScope;
 import top.flobby.admin.common.core.PageResult;
 import top.flobby.admin.common.exception.BusinessException;
+import top.flobby.admin.system.domain.entity.Department;
+import top.flobby.admin.system.domain.entity.Role;
 import top.flobby.admin.system.domain.entity.User;
 import top.flobby.admin.system.domain.entity.UserDept;
 import top.flobby.admin.system.domain.entity.UserRole;
@@ -27,7 +29,10 @@ import top.flobby.admin.system.interfaces.query.UserQuery;
 import top.flobby.admin.system.interfaces.vo.UserVO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -66,9 +71,46 @@ public class UserService {
         // 查询用户
         Page<User> userPage = userRepository.findByQuery(query, pageable);
 
+        List<User> users = userPage.getContent();
+        if (users.isEmpty()) {
+            return PageResult.build(
+                    List.of(),
+                    userPage.getTotalElements(),
+                    (long) query.getPageNum(),
+                    (long) query.getPageSize()
+            );
+        }
+
+        // 批量预加载用户角色和部门信息，避免 N+1 查询
+        List<Long> userIds = users.stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+
+        List<UserRole> userRoles = jpaUserRoleRepository.findByUserIdIn(userIds);
+        Map<Long, List<UserRole>> userRolesMap = userRoles.stream()
+                .collect(Collectors.groupingBy(UserRole::getUserId));
+        Set<Long> roleIds = userRoles.stream()
+                .map(UserRole::getRoleId)
+                .collect(Collectors.toSet());
+        Map<Long, Role> roleMap = roleIds.isEmpty()
+                ? Collections.emptyMap()
+                : jpaRoleRepository.findAllById(roleIds).stream()
+                .collect(Collectors.toMap(Role::getId, role -> role, (a, b) -> a));
+
+        List<UserDept> userDepts = jpaUserDeptRepository.findByUserIdIn(userIds);
+        Map<Long, List<UserDept>> userDeptsMap = userDepts.stream()
+                .collect(Collectors.groupingBy(UserDept::getUserId));
+        Set<Long> deptIds = userDepts.stream()
+                .map(UserDept::getDeptId)
+                .collect(Collectors.toSet());
+        Map<Long, Department> deptMap = deptIds.isEmpty()
+                ? Collections.emptyMap()
+                : jpaDepartmentRepository.findAllById(deptIds).stream()
+                .collect(Collectors.toMap(Department::getId, dept -> dept, (a, b) -> a));
+
         // 转换为VO
-        List<UserVO> userVOList = userPage.getContent().stream()
-                .map(this::convertToVO)
+        List<UserVO> userVOList = users.stream()
+                .map(user -> convertToVO(user, userRolesMap, roleMap, userDeptsMap, deptMap))
                 .collect(Collectors.toList());
 
         return PageResult.build(
@@ -85,7 +127,33 @@ public class UserService {
     public UserVO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("用户不存在"));
-        return convertToVO(user);
+
+        // 使用批量预加载避免 N+1 查询
+        List<Long> userIds = List.of(id);
+
+        List<UserRole> userRoles = jpaUserRoleRepository.findByUserIdIn(userIds);
+        Map<Long, List<UserRole>> userRolesMap = userRoles.stream()
+                .collect(Collectors.groupingBy(UserRole::getUserId));
+        Set<Long> roleIds = userRoles.stream()
+                .map(UserRole::getRoleId)
+                .collect(Collectors.toSet());
+        Map<Long, Role> roleMap = roleIds.isEmpty()
+                ? Collections.emptyMap()
+                : jpaRoleRepository.findAllById(roleIds).stream()
+                .collect(Collectors.toMap(Role::getId, role -> role, (a, b) -> a));
+
+        List<UserDept> userDepts = jpaUserDeptRepository.findByUserIdIn(userIds);
+        Map<Long, List<UserDept>> userDeptsMap = userDepts.stream()
+                .collect(Collectors.groupingBy(UserDept::getUserId));
+        Set<Long> deptIds = userDepts.stream()
+                .map(UserDept::getDeptId)
+                .collect(Collectors.toSet());
+        Map<Long, Department> deptMap = deptIds.isEmpty()
+                ? Collections.emptyMap()
+                : jpaDepartmentRepository.findAllById(deptIds).stream()
+                .collect(Collectors.toMap(Department::getId, dept -> dept, (a, b) -> a));
+
+        return convertToVO(user, userRolesMap, roleMap, userDeptsMap, deptMap);
     }
 
     /**
@@ -378,6 +446,59 @@ public class UserService {
                 deptInfo.setName(dept.getDeptName());
                 deptInfos.add(deptInfo);
             });
+        }
+        vo.setDepts(deptInfos);
+
+        return vo;
+    }
+
+    /**
+     * 转换为VO（批量预加载版本，避免 N+1 查询）
+     */
+    private UserVO convertToVO(User user,
+                               Map<Long, List<UserRole>> userRolesMap,
+                               Map<Long, Role> roleMap,
+                               Map<Long, List<UserDept>> userDeptsMap,
+                               Map<Long, Department> deptMap) {
+        UserVO vo = new UserVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setRealName(user.getRealName());
+        vo.setEmail(user.getEmail());
+        vo.setPhone(user.getPhone());
+        vo.setAvatar(user.getAvatar());
+        vo.setStatus(user.getStatus());
+        vo.setCreateTime(user.getCreateTime());
+        vo.setUpdateTime(user.getUpdateTime());
+        vo.setCreateBy(user.getCreateBy());
+        vo.setUpdateBy(user.getUpdateBy());
+
+        // 加载用户角色信息（从预加载的 Map 中获取）
+        List<UserRole> userRoles = userRolesMap.getOrDefault(user.getId(), Collections.emptyList());
+        List<UserVO.RoleInfo> roleInfos = new ArrayList<>();
+        for (UserRole userRole : userRoles) {
+            Role role = roleMap.get(userRole.getRoleId());
+            if (role != null) {
+                UserVO.RoleInfo roleInfo = new UserVO.RoleInfo();
+                roleInfo.setId(role.getId());
+                roleInfo.setName(role.getRoleName());
+                roleInfo.setCode(role.getRoleCode());
+                roleInfos.add(roleInfo);
+            }
+        }
+        vo.setRoles(roleInfos);
+
+        // 加载用户部门信息（从预加载的 Map 中获取）
+        List<UserDept> userDepts = userDeptsMap.getOrDefault(user.getId(), Collections.emptyList());
+        List<UserVO.DeptInfo> deptInfos = new ArrayList<>();
+        for (UserDept userDept : userDepts) {
+            Department dept = deptMap.get(userDept.getDeptId());
+            if (dept != null) {
+                UserVO.DeptInfo deptInfo = new UserVO.DeptInfo();
+                deptInfo.setId(dept.getId());
+                deptInfo.setName(dept.getDeptName());
+                deptInfos.add(deptInfo);
+            }
         }
         vo.setDepts(deptInfos);
 

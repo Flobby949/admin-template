@@ -13,7 +13,7 @@
 
     <!-- 统计卡片 -->
     <el-row :gutter="20" class="stats-row">
-      <el-col :xs="12" :sm="12" :md="6" v-for="(card, index) in statsCards" :key="index">
+      <el-col v-for="(card, index) in statsCards" :key="index" :xs="12" :sm="12" :md="6">
         <div class="stat-card" :style="{ '--accent-color': card.color }">
           <div class="stat-icon" :style="{ background: card.bg }">
             <el-icon :color="card.color" :size="24">
@@ -108,7 +108,21 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { User, View, Money, Goods, Top, Bottom, Setting, Document, UserFilled, List } from '@element-plus/icons-vue'
+import {
+  User,
+  View,
+  Money,
+  Goods,
+  Top,
+  Bottom,
+  Setting,
+  Document,
+  UserFilled,
+  List
+} from '@element-plus/icons-vue'
+
+// Register dynamic components for template usage
+const _dynamicIcons = { Top, Bottom }
 
 // 当前时间
 const currentTime = computed(() => {
@@ -252,11 +266,11 @@ const quickActions = [
     font-weight: 500;
 
     &.up {
-      color: #10B981;
+      color: #10b981;
     }
 
     &.down {
-      color: #EF4444;
+      color: #ef4444;
     }
   }
 }

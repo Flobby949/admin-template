@@ -28,12 +28,7 @@
 
     <div class="icon-select-container">
       <!-- 搜索框 -->
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索图标..."
-        clearable
-        class="search-input"
-      >
+      <el-input v-model="searchKeyword" placeholder="搜索图标..." clearable class="search-input">
         <template #prefix>
           <el-icon><Search /></el-icon>
         </template>
@@ -109,7 +104,7 @@ const filteredIcons = computed(() => {
 // 监听 modelValue 变化
 watch(
   () => props.modelValue,
-  (newVal) => {
+  newVal => {
     selectedIcon.value = newVal
   }
 )

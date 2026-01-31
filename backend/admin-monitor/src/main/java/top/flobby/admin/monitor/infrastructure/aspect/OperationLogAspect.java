@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import top.flobby.admin.common.annotation.OperLog;
+import top.flobby.admin.common.utils.LogDesensitizeUtils;
 import top.flobby.admin.monitor.application.OperationLogService;
 import top.flobby.admin.monitor.domain.entity.OperationLog;
 
@@ -101,26 +102,28 @@ public class OperationLogAspect {
                 log.setOperName(authentication.getName());
             }
 
-            // 保存请求参数
+            // 保存请求参数（脱敏处理）
             if (operLog.saveRequestData()) {
                 Object[] args = joinPoint.getArgs();
                 if (args != null && args.length > 0) {
                     try {
                         String params = objectMapper.writeValueAsString(args);
-                        log.setOperParam(params);
+                        // 对敏感信息进行脱敏处理
+                        log.setOperParam(LogDesensitizeUtils.desensitize(params));
                     } catch (Exception ex) {
-                        log.setOperParam(Arrays.toString(args));
+                        log.setOperParam(LogDesensitizeUtils.desensitize(Arrays.toString(args)));
                     }
                 }
             }
 
-            // 保存响应结果
+            // 保存响应结果（脱敏处理）
             if (operLog.saveResponseData() && result != null) {
                 try {
                     String jsonResult = objectMapper.writeValueAsString(result);
-                    log.setJsonResult(jsonResult);
+                    // 对敏感信息进行脱敏处理
+                    log.setJsonResult(LogDesensitizeUtils.desensitize(jsonResult));
                 } catch (Exception ex) {
-                    log.setJsonResult(result.toString());
+                    log.setJsonResult(LogDesensitizeUtils.desensitize(result.toString()));
                 }
             }
 
