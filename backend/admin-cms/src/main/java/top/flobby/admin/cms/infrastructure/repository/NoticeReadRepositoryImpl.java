@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 import top.flobby.admin.cms.domain.entity.NoticeRead;
 import top.flobby.admin.cms.domain.repository.NoticeReadRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,5 +48,18 @@ public class NoticeReadRepositoryImpl implements NoticeReadRepository {
     @Override
     public boolean existsByNoticeIdAndUserId(Long noticeId, Long userId) {
         return jpaNoticeReadRepository.existsByNoticeIdAndUserId(noticeId, userId);
+    }
+
+    @Override
+    public Map<Long, Long> countByNoticeIds(Set<Long> noticeIds) {
+        if (noticeIds == null || noticeIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<Long, Long> result = new HashMap<>();
+        List<Object[]> counts = jpaNoticeReadRepository.countByNoticeIdIn(noticeIds);
+        for (Object[] row : counts) {
+            result.put((Long) row[0], (Long) row[1]);
+        }
+        return result;
     }
 }

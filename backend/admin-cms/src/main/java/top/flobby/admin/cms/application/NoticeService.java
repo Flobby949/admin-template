@@ -27,7 +27,9 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 公告服务
@@ -54,8 +56,14 @@ public class NoticeService {
         Specification<Notice> spec = buildSpecification(query);
         Page<Notice> page = noticeRepository.findAll(spec, pageable);
 
+        // 批量统计已读数量，避免 N+1 查询
+        Set<Long> noticeIds = page.getContent().stream()
+                .map(Notice::getId)
+                .collect(Collectors.toSet());
+        Map<Long, Long> readCountMap = noticeReadRepository.countByNoticeIds(noticeIds);
+
         List<NoticeVO> list = page.getContent().stream()
-                .map(this::toNoticeVO)
+                .map(notice -> toNoticeVO(notice, readCountMap))
                 .toList();
 
         return new PageResult<>(list, page.getTotalElements(), (long) query.getPageNum(), (long) query.getPageSize());
@@ -122,7 +130,7 @@ public class NoticeService {
         notice.setCreateBy(currentUser.getUsername());
 
         Notice saved = noticeRepository.save(notice);
-        log.info("创建公告成功: id={}, title=", saved.getId(), saved.getTitle());
+        log.info("创建公告成功: id={}, title={}", saved.getId(), saved.getTitle());
         return saved.getId();
     }
 
@@ -223,6 +231,10 @@ public class NoticeService {
     }
 
     private NoticeVO toNoticeVO(Notice notice) {
+        return toNoticeVO(notice, null);
+    }
+
+    private NoticeVO toNoticeVO(Notice notice, Map<Long, Long> readCountMap) {
         NoticeVO vo = new NoticeVO();
         vo.setId(notice.getId());
         vo.setTitle(notice.getTitle());
@@ -235,7 +247,11 @@ public class NoticeService {
         vo.setSortOrder(notice.getSortOrder());
         vo.setCreateTime(notice.getCreateTime());
         vo.setCreateBy(notice.getCreateBy());
-        vo.setReadCount(noticeReadRepository.countByNoticeId(notice.getId()));
+        if (readCountMap != null) {
+            vo.setReadCount(readCountMap.getOrDefault(notice.getId(), 0L));
+        } else {
+            vo.setReadCount(noticeReadRepository.countByNoticeId(notice.getId()));
+        }
         return vo;
     }
 

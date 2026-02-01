@@ -24,4 +24,7 @@ public interface JpaNoticeReadRepository extends JpaRepository<NoticeRead, Long>
     long countByNoticeId(Long noticeId);
 
     boolean existsByNoticeIdAndUserId(Long noticeId, Long userId);
+
+    @Query("SELECT nr.noticeId, COUNT(nr) FROM NoticeRead nr WHERE nr.noticeId IN :noticeIds GROUP BY nr.noticeId")
+    List<Object[]> countByNoticeIdIn(@Param("noticeIds") Set<Long> noticeIds);
 }

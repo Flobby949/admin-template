@@ -25,7 +25,11 @@ import top.flobby.admin.system.domain.repository.UserRepository;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 文章服务
@@ -52,8 +56,20 @@ public class ArticleService {
         Specification<Article> spec = buildSpecification(query);
         Page<Article> page = articleRepository.findAll(spec, pageable);
 
+        // 批量加载分类名称，避免 N+1 查询
+        Set<Long> categoryIds = page.getContent().stream()
+                .map(Article::getCategoryId)
+                .filter(id -> id != null)
+                .collect(Collectors.toSet());
+        Map<Long, String> categoryNameMap = new HashMap<>();
+        if (!categoryIds.isEmpty()) {
+            categoryRepository.findAll().stream()
+                    .filter(c -> categoryIds.contains(c.getId()))
+                    .forEach(c -> categoryNameMap.put(c.getId(), c.getCategoryName()));
+        }
+
         List<ArticleVO> list = page.getContent().stream()
-                .map(this::toArticleVO)
+                .map(article -> toArticleVO(article, categoryNameMap))
                 .toList();
 
         return new PageResult<>(list, page.getTotalElements(), (long) query.getPageNum(), (long) query.getPageSize());
@@ -223,6 +239,10 @@ public class ArticleService {
     }
 
     private ArticleVO toArticleVO(Article article) {
+        return toArticleVO(article, null);
+    }
+
+    private ArticleVO toArticleVO(Article article, Map<Long, String> categoryNameMap) {
         ArticleVO vo = new ArticleVO();
         vo.setId(article.getId());
         vo.setTitle(article.getTitle());
@@ -243,8 +263,12 @@ public class ArticleService {
         vo.setCreateBy(article.getCreateBy());
 
         if (article.getCategoryId() != null) {
-            categoryRepository.findById(article.getCategoryId())
-                    .ifPresent(c -> vo.setCategoryName(c.getCategoryName()));
+            if (categoryNameMap != null && categoryNameMap.containsKey(article.getCategoryId())) {
+                vo.setCategoryName(categoryNameMap.get(article.getCategoryId()));
+            } else {
+                categoryRepository.findById(article.getCategoryId())
+                        .ifPresent(c -> vo.setCategoryName(c.getCategoryName()));
+            }
         }
 
         return vo;

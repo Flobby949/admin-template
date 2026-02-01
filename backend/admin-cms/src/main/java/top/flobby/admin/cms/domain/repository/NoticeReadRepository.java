@@ -3,6 +3,7 @@ package top.flobby.admin.cms.domain.repository;
 import top.flobby.admin.cms.domain.entity.NoticeRead;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,4 +23,9 @@ public interface NoticeReadRepository {
     long countByNoticeId(Long noticeId);
 
     boolean existsByNoticeIdAndUserId(Long noticeId, Long userId);
+
+    /**
+     * 批量统计已读数量
+     */
+    Map<Long, Long> countByNoticeIds(Set<Long> noticeIds);
 }
