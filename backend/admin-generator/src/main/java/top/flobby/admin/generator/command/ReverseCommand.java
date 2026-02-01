@@ -89,6 +89,12 @@ public class ReverseCommand implements Callable<Integer> {
     )
     private String dbPassword;
 
+    @Option(
+            names = {"--table-prefix", "-t"},
+            description = "表前缀（生成类名时去除，多个前缀用逗号分隔，如 t_,sys_）"
+    )
+    private String tablePrefix;
+
     @Override
     public Integer call() {
         try {
@@ -118,6 +124,9 @@ public class ReverseCommand implements Callable<Integer> {
             }
             if (overwrite) {
                 config.getOptions().setOverwrite(true);
+            }
+            if (tablePrefix != null) {
+                config.getGlobal().setTablePrefix(tablePrefix);
             }
 
             // 验证数据库配置

@@ -187,14 +187,18 @@ public final class TypeMapper {
         if (lowerName.equals("id") || lowerName.contains("password") || lowerName.contains("content")
                 || lowerName.contains("remark") || lowerName.contains("description")
                 || lowerName.equals("deleted") || lowerName.equals("createby") || lowerName.equals("updateby")
-                || lowerName.equals("updatetime")) {
+                || lowerName.equals("updatetime") || lowerName.equals("createtime")) {
+            return false;
+        }
+
+        // 排除日期时间类型（避免生成复杂的查询方法）
+        if (javaType != null && (javaType.equals("LocalDateTime") || javaType.equals("LocalDate") || javaType.equals("LocalTime"))) {
             return false;
         }
 
         // 常见的查询字段
         if (lowerName.contains("name") || lowerName.contains("title") || lowerName.contains("code")
-                || lowerName.contains("status") || lowerName.contains("type") || lowerName.contains("state")
-                || lowerName.equals("createtime")) {
+                || lowerName.contains("status") || lowerName.contains("type") || lowerName.contains("state")) {
             return true;
         }
 

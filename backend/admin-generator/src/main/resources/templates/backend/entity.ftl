@@ -1,8 +1,5 @@
 package ${packageName}.${moduleName}.domain.entity;
 
-<#list entity.imports as import>
-import ${import};
-</#list>
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +8,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+<#list entity.imports as import>
+<#if import != "java.time.LocalDateTime">
+import ${import};
+</#if>
+</#list>
 
 /**
  * ${entity.comment!entity.className}实体
@@ -48,7 +50,19 @@ public class ${entity.className} {
 <#else>
     @Column(name = "${field.columnName}"<#if !field.isNullable>, nullable = false</#if>)
 </#if>
-    private ${field.fieldType} ${field.fieldName}<#if field.defaultValue??> = ${field.defaultValue}</#if>;
+<#if field.fieldType == "LocalDateTime">
+    private ${field.fieldType} ${field.fieldName};
+<#elseif field.fieldType == "String" && field.defaultValue??>
+    private ${field.fieldType} ${field.fieldName} = "${field.defaultValue}";
+<#elseif field.defaultValue?? && field.defaultValue != "CURRENT_TIMESTAMP">
+<#if field.fieldType == "Long">
+    private ${field.fieldType} ${field.fieldName} = ${field.defaultValue}L;
+<#else>
+    private ${field.fieldType} ${field.fieldName} = ${field.defaultValue};
+</#if>
+<#else>
+    private ${field.fieldType} ${field.fieldName};
+</#if>
 
 </#if>
 </#list>

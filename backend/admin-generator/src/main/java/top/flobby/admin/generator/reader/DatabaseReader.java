@@ -187,7 +187,11 @@ public class DatabaseReader {
                     field.setDefaultValue(columnDefault);
 
                     if (maxLength != null && maxLength > 0 && maxLength < Integer.MAX_VALUE) {
-                        field.setMaxLength(maxLength.intValue());
+                        // TEXT 类型不设置 maxLength，避免生成无效的 length 属性
+                        String upperDataType = dataType.toUpperCase();
+                        if (!upperDataType.contains("TEXT")) {
+                            field.setMaxLength(maxLength.intValue());
+                        }
                     }
 
                     // 推断表单类型
