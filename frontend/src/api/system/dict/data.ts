@@ -65,7 +65,7 @@ export function addData(data: Partial<DictDataVO>) {
 // 修改字典数据
 export function updateData(data: Partial<DictDataVO>) {
   return request({
-    url: '/system/dict/data',
+    url: `/system/dict/data/${data.id}`,
     method: 'put',
     data
   })

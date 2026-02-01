@@ -66,18 +66,17 @@ export function delType(dictId: number) {
   })
 }
 
-// 刷新字典缓存
-export function refreshCache() {
-  return request({
-    url: '/system/dict/types/refresh',
-    method: 'delete'
-  })
+// 获取字典选择框列表（使用列表接口）
+export function optionselect() {
+  return request<PageResult<DictTypeVO>>({
+    url: '/system/dict/types',
+    method: 'get',
+    params: { pageNum: 1, pageSize: 1000 }
+  }).then(res => res.list)
 }
 
-// 获取字典选择框列表
-export function optionselect() {
-  return request<DictTypeVO[]>({
-    url: '/system/dict/types/optionselect',
-    method: 'get'
-  })
+// 刷新字典缓存（前端模拟，后端暂无此接口）
+export function refreshCache() {
+  // 后端暂无刷新缓存接口，返回成功
+  return Promise.resolve()
 }

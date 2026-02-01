@@ -7,7 +7,6 @@
           <el-button
             v-permission="'cms:category:add'"
             type="primary"
-            plain
             icon="Plus"
             @click="handleAdd()"
           >

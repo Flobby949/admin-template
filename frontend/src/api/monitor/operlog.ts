@@ -58,7 +58,7 @@ export function delOperLog(ids: number[]) {
   return request<void>({
     url: '/monitor/operation-logs',
     method: 'delete',
-    data: ids
+    params: { ids: ids.join(',') }
   })
 }
 
@@ -67,7 +67,7 @@ export function delOperLog(ids: number[]) {
  */
 export function cleanOperLog() {
   return request<void>({
-    url: '/monitor/operation-logs/clean',
+    url: '/monitor/operation-logs/clear',
     method: 'delete'
   })
 }

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(data: any) {
   return request({
-    url: 'auth/login',
+    url: '/auth/login',
     method: 'post',
     data
   })
@@ -10,14 +10,14 @@ export function login(data: any) {
 
 export function getInfo() {
   return request({
-    url: 'auth/info',
+    url: '/auth/info',
     method: 'get'
   })
 }
 
 export function logout() {
   return request({
-    url: 'auth/logout',
+    url: '/auth/logout',
     method: 'post'
   })
 }
@@ -25,7 +25,7 @@ export function logout() {
 // 获取用户路由
 export function getRouters() {
   return request({
-    url: 'auth/routers',
+    url: '/auth/routers',
     method: 'get'
   })
 }
@@ -33,7 +33,7 @@ export function getRouters() {
 // 获取用户权限列表
 export function getPermissions() {
   return request<string[]>({
-    url: 'auth/permissions',
+    url: '/auth/permissions',
     method: 'get'
   })
 }
@@ -41,7 +41,7 @@ export function getPermissions() {
 // 修改密码
 export function changePassword(oldPassword: string, newPassword: string) {
   return request<void>({
-    url: 'auth/password',
+    url: '/auth/password',
     method: 'put',
     params: { oldPassword, newPassword }
   })

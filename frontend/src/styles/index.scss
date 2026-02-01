@@ -350,7 +350,7 @@ html.dark {
         margin-right: 0;
       }
 
-      span {
+      > span:not(.el-icon) {
         display: none;
       }
     }

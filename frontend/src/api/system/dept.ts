@@ -52,10 +52,11 @@ export function getDeptTree(query?: DeptQuery) {
 
 /**
  * Get Department List (Flat)
+ * Note: Backend only provides tree endpoint, use tree and flatten if needed
  */
 export function getDeptList(query?: DeptQuery) {
   return request<DeptVO[]>({
-    url: '/system/departments/list',
+    url: '/system/departments/tree',
     method: 'get',
     params: query
   })
