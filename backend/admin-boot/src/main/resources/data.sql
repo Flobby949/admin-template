@@ -66,7 +66,23 @@ VALUES
     (101, 100, '操作日志', 2, 'operlog', 'monitor/operlog/index', 'monitor:operlog:list', 'Document', 1, 1, 1, 0),
     (102, 101, '日志查询', 3, NULL, NULL, 'monitor:operlog:list', NULL, 1, 1, 1, 0),
     (103, 101, '日志删除', 3, NULL, NULL, 'monitor:operlog:delete', NULL, 2, 1, 1, 0),
-    (104, 101, '日志导出', 3, NULL, NULL, 'monitor:operlog:export', NULL, 3, 1, 1, 0)
+    (104, 101, '日志导出', 3, NULL, NULL, 'monitor:operlog:export', NULL, 3, 1, 1, 0),
+    -- CMS 内容管理
+    (200, 0, '内容管理', 1, '/cms', 'Layout', NULL, 'Document', 3, 1, 1, 0),
+    (201, 200, '分类管理', 2, 'category', 'cms/category/index', 'cms:category:list', 'Files', 1, 1, 1, 0),
+    (202, 201, '分类新增', 3, NULL, NULL, 'cms:category:add', NULL, 1, 1, 1, 0),
+    (203, 201, '分类编辑', 3, NULL, NULL, 'cms:category:edit', NULL, 2, 1, 1, 0),
+    (204, 201, '分类删除', 3, NULL, NULL, 'cms:category:delete', NULL, 3, 1, 1, 0),
+    (210, 200, '文章管理', 2, 'article', 'cms/article/index', 'cms:article:list', 'Reading', 2, 1, 1, 0),
+    (211, 210, '文章新增', 3, NULL, NULL, 'cms:article:add', NULL, 1, 1, 1, 0),
+    (212, 210, '文章编辑', 3, NULL, NULL, 'cms:article:edit', NULL, 2, 1, 1, 0),
+    (213, 210, '文章删除', 3, NULL, NULL, 'cms:article:delete', NULL, 3, 1, 1, 0),
+    (214, 210, '文章发布', 3, NULL, NULL, 'cms:article:publish', NULL, 4, 1, 1, 0),
+    (220, 200, '通知公告', 2, 'notice', 'cms/notice/index', 'cms:notice:list', 'Bell', 3, 1, 1, 0),
+    (221, 220, '公告新增', 3, NULL, NULL, 'cms:notice:add', NULL, 1, 1, 1, 0),
+    (222, 220, '公告编辑', 3, NULL, NULL, 'cms:notice:edit', NULL, 2, 1, 1, 0),
+    (223, 220, '公告删除', 3, NULL, NULL, 'cms:notice:delete', NULL, 3, 1, 1, 0),
+    (224, 220, '公告发布', 3, NULL, NULL, 'cms:notice:publish', NULL, 4, 1, 1, 0)
 ON DUPLICATE KEY UPDATE
     menu_name = VALUES(menu_name),
     menu_type = VALUES(menu_type),
@@ -95,7 +111,9 @@ VALUES
     (1, '用户状态', 'sys_user_status', 1, '用户状态列表', 0),
     (2, '用户性别', 'sys_user_sex', 1, '用户性别列表', 0),
     (3, '系统状态', 'sys_normal_disable', 1, '系统通用状态', 0),
-    (4, '是否', 'sys_yes_no', 1, '系统是否列表', 0)
+    (4, '是否', 'sys_yes_no', 1, '系统是否列表', 0),
+    (5, '文章状态', 'cms_article_status', 1, '文章状态列表', 0),
+    (6, '公告状态', 'cms_notice_status', 1, '公告状态列表', 0)
 ON DUPLICATE KEY UPDATE
     dict_name = VALUES(dict_name),
     status = VALUES(status),
@@ -117,7 +135,16 @@ VALUES
     ('sys_normal_disable', '停用', '0', 2, 'danger', 0, 1, '停用状态', 0),
     -- 是否
     ('sys_yes_no', '是', 'Y', 1, 'success', 0, 1, '系统默认是', 0),
-    ('sys_yes_no', '否', 'N', 2, 'danger', 0, 1, '系统默认否', 0)
+    ('sys_yes_no', '否', 'N', 2, 'danger', 0, 1, '系统默认否', 0),
+    -- 文章状态
+    ('cms_article_status', '草稿', '0', 1, 'info', 0, 1, '文章草稿状态', 0),
+    ('cms_article_status', '待审核', '1', 2, 'warning', 0, 1, '文章待审核状态', 0),
+    ('cms_article_status', '已发布', '2', 3, 'success', 0, 1, '文章已发布状态', 0),
+    ('cms_article_status', '已下架', '3', 4, 'danger', 0, 1, '文章已下架状态', 0),
+    -- 公告状态
+    ('cms_notice_status', '草稿', '0', 1, 'info', 0, 1, '公告草稿状态', 0),
+    ('cms_notice_status', '已发布', '1', 2, 'success', 0, 1, '公告已发布状态', 0),
+    ('cms_notice_status', '已撤回', '2', 3, 'danger', 0, 1, '公告已撤回状态', 0)
 ON DUPLICATE KEY UPDATE
     dict_label = VALUES(dict_label),
     dict_sort = VALUES(dict_sort),

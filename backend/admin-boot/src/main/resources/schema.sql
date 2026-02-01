@@ -192,3 +192,88 @@ CREATE TABLE IF NOT EXISTS sys_oper_log (
     INDEX idx_status (status),
     INDEX idx_tenant (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+
+-- =============================================
+-- CMS 内容管理模块
+-- =============================================
+
+-- 分类表
+CREATE TABLE IF NOT EXISTS cms_category (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '分类ID',
+    parent_id BIGINT DEFAULT 0 COMMENT '父分类ID',
+    ancestors VARCHAR(500) COMMENT '祖级列表,格式: 0,1,2',
+    category_name VARCHAR(100) NOT NULL COMMENT '分类名称',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    status TINYINT DEFAULT 1 COMMENT '状态：0-禁用，1-启用',
+    dept_id BIGINT COMMENT '所属部门ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_by VARCHAR(50) COMMENT '更新人',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记：0-未删除，1-已删除',
+    INDEX idx_parent_id (parent_id),
+    INDEX idx_ancestors (ancestors(100)),
+    INDEX idx_status (status),
+    INDEX idx_dept_id (dept_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='CMS分类表';
+
+-- 文章表
+CREATE TABLE IF NOT EXISTS cms_article (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '文章ID',
+    title VARCHAR(200) NOT NULL COMMENT '标题',
+    summary VARCHAR(500) COMMENT '摘要',
+    content LONGTEXT COMMENT '正文(富文本)',
+    category_id BIGINT COMMENT '分类ID',
+    cover_url VARCHAR(500) COMMENT '封面URL',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-草稿，1-待审核，2-已发布，3-已下架',
+    publish_time DATETIME COMMENT '发布时间',
+    revoke_time DATETIME COMMENT '下架时间',
+    audit_by VARCHAR(50) COMMENT '审核人',
+    audit_time DATETIME COMMENT '审核时间',
+    dept_id BIGINT COMMENT '所属部门ID',
+    author_id BIGINT COMMENT '作者用户ID',
+    view_count BIGINT DEFAULT 0 COMMENT '浏览量',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_by VARCHAR(50) COMMENT '更新人',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记：0-未删除，1-已删除',
+    INDEX idx_category_id (category_id),
+    INDEX idx_status (status),
+    INDEX idx_dept_id (dept_id),
+    INDEX idx_author_id (author_id),
+    INDEX idx_publish_time (publish_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='CMS文章表';
+
+-- 通知公告表
+CREATE TABLE IF NOT EXISTS cms_notice (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '公告ID',
+    title VARCHAR(200) NOT NULL COMMENT '标题',
+    content LONGTEXT COMMENT '内容(富文本)',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-草稿，1-已发布，2-已撤回',
+    publish_time DATETIME COMMENT '发布时间',
+    revoke_time DATETIME COMMENT '撤回时间',
+    dept_id BIGINT COMMENT '所属部门ID',
+    publisher_id BIGINT COMMENT '发布人用户ID',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    create_by VARCHAR(50) COMMENT '创建人',
+    update_by VARCHAR(50) COMMENT '更新人',
+    deleted TINYINT DEFAULT 0 COMMENT '删除标记：0-未删除，1-已删除',
+    INDEX idx_status (status),
+    INDEX idx_dept_id (dept_id),
+    INDEX idx_publish_time (publish_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知公告表';
+
+-- 公告已读记录表
+CREATE TABLE IF NOT EXISTS cms_notice_read (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    notice_id BIGINT NOT NULL COMMENT '公告ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    read_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '阅读时间',
+    UNIQUE KEY uk_notice_user (notice_id, user_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_notice_id (notice_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公告已读记录表';

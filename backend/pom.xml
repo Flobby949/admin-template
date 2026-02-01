@@ -17,6 +17,7 @@
         <module>admin-shared-kernel</module>
         <module>admin-system</module>
         <module>admin-monitor</module>
+        <module>admin-cms</module>
         <module>admin-boot</module>
     </modules>
 
