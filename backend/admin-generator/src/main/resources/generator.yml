@@ -1,0 +1,126 @@
+# 代码生成器配置示例
+# 使用方法: java -jar admin-generator.jar generate -c generator.yml
+
+# 全局配置
+global:
+  # 包名前缀
+  packageName: top.flobby.admin
+  # 模块名
+  moduleName: demo
+  # 作者
+  author: Code Generator
+  # 日期格式
+  dateFormat: yyyy-MM-dd
+  # 后端输出路径（相对于项目根目录）
+  backendOutputPath: backend/admin-${moduleName}/src/main/java
+  # 前端输出路径（相对于项目根目录）
+  frontendOutputPath: frontend/src
+  # 自定义模板目录（可选，不配置则使用默认模板）
+  # templatePath: /path/to/custom/templates
+  # 表前缀（生成类名时会去除）
+  tablePrefix: sys_,cms_
+
+# 数据库配置（用于逆向生成）
+database:
+  url: jdbc:mysql://localhost:3306/admin_system?useSSL=false&serverTimezone=Asia/Shanghai
+  username: root
+  password: your_password
+  # 要生成的表（支持通配符 *）
+  tables:
+    - demo_*
+
+# 实体配置（用于配置文件生成）
+entities:
+  - tableName: demo_product
+    className: Product
+    comment: 商品
+    # 字段配置
+    fields:
+      - columnName: id
+        fieldName: id
+        fieldType: Long
+        comment: 主键
+        isPrimaryKey: true
+        isNullable: false
+        isQuery: false
+        isList: true
+        isForm: false
+
+      - columnName: product_name
+        fieldName: productName
+        fieldType: String
+        comment: 商品名称
+        isPrimaryKey: false
+        isNullable: false
+        isQuery: true
+        isList: true
+        isForm: true
+        formType: input
+        maxLength: 100
+
+      - columnName: price
+        fieldName: price
+        fieldType: BigDecimal
+        comment: 价格
+        isPrimaryKey: false
+        isNullable: false
+        isQuery: false
+        isList: true
+        isForm: true
+        formType: number
+
+      - columnName: status
+        fieldName: status
+        fieldType: Integer
+        comment: 状态：0-下架，1-上架
+        isPrimaryKey: false
+        isNullable: false
+        isQuery: true
+        isList: true
+        isForm: true
+        formType: select
+        dictType: product_status
+
+      - columnName: description
+        fieldName: description
+        fieldType: String
+        comment: 商品描述
+        isPrimaryKey: false
+        isNullable: true
+        isQuery: false
+        isList: false
+        isForm: true
+        formType: textarea
+
+      - columnName: create_time
+        fieldName: createTime
+        fieldType: LocalDateTime
+        comment: 创建时间
+        isPrimaryKey: false
+        isNullable: false
+        isQuery: true
+        isList: true
+        isForm: false
+
+      - columnName: update_time
+        fieldName: updateTime
+        fieldType: LocalDateTime
+        comment: 更新时间
+        isPrimaryKey: false
+        isNullable: true
+        isQuery: false
+        isList: false
+        isForm: false
+
+# 生成选项
+options:
+  # 是否生成后端代码
+  generateBackend: true
+  # 是否生成前端代码
+  generateFrontend: true
+  # 是否覆盖已存在的文件
+  overwrite: false
+  # 是否生成 Repository 实现类
+  generateRepositoryImpl: true
+  # 是否生成 Query 查询对象
+  generateQuery: true
