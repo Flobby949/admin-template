@@ -64,7 +64,7 @@ export interface RegionQuery {
  */
 export function listRegions() {
   return request<RegionVO[]>({
-    url: '/api/system/regions',
+    url: '/system/regions',
     method: 'get'
   })
 }
@@ -74,7 +74,7 @@ export function listRegions() {
  */
 export function getRegion(id: number) {
   return request<RegionVO>({
-    url: `/api/system/regions/${id}`,
+    url: `/system/regions/${id}`,
     method: 'get'
   })
 }
@@ -84,7 +84,7 @@ export function getRegion(id: number) {
  */
 export function createRegion(data: RegionDTO) {
   return request<number>({
-    url: '/api/system/regions',
+    url: '/system/regions',
     method: 'post',
     data
   })
@@ -95,7 +95,7 @@ export function createRegion(data: RegionDTO) {
  */
 export function updateRegion(id: number, data: RegionDTO) {
   return request<void>({
-    url: `/api/system/regions/${id}`,
+    url: `/system/regions/${id}`,
     method: 'put',
     data
   })
@@ -106,7 +106,7 @@ export function updateRegion(id: number, data: RegionDTO) {
  */
 export function deleteRegion(id: number) {
   return request<void>({
-    url: `/api/system/regions/${id}`,
+    url: `/system/regions/${id}`,
     method: 'delete'
   })
 }

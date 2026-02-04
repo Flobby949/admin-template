@@ -119,14 +119,17 @@ export const usePermissionStore = defineStore('permission', {
         return () => import('@/layout/index.vue')
       }
 
+      // 去除开头的斜杠
+      const normalizedComponent = component.startsWith('/') ? component.slice(1) : component
+
       // 动态加载 views 下的组件
-      const componentPath = `/src/views/${component}.vue`
+      const componentPath = `/src/views/${normalizedComponent}.vue`
       if (modules[componentPath]) {
         return modules[componentPath]
       }
 
       // 尝试添加 index.vue
-      const indexPath = `/src/views/${component}/index.vue`
+      const indexPath = `/src/views/${normalizedComponent}/index.vue`
       if (modules[indexPath]) {
         return modules[indexPath]
       }

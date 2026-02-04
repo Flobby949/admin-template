@@ -38,7 +38,7 @@ export interface ${entity.className}Query {
  */
 export function list${entity.className}s() {
   return request<${entity.className}VO[]>({
-    url: '/api/${moduleName}/${entity.apiPath}s',
+    url: '/${moduleName}/${entity.apiPath}s',
     method: 'get'
   })
 }
@@ -48,7 +48,7 @@ export function list${entity.className}s() {
  */
 export function get${entity.className}(id: number) {
   return request<${entity.className}VO>({
-    url: `/api/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
+    url: `/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
     method: 'get'
   })
 }
@@ -58,7 +58,7 @@ export function get${entity.className}(id: number) {
  */
 export function create${entity.className}(data: ${entity.className}DTO) {
   return request<number>({
-    url: '/api/${moduleName}/${entity.apiPath}s',
+    url: '/${moduleName}/${entity.apiPath}s',
     method: 'post',
     data
   })
@@ -69,7 +69,7 @@ export function create${entity.className}(data: ${entity.className}DTO) {
  */
 export function update${entity.className}(id: number, data: ${entity.className}DTO) {
   return request<void>({
-    url: `/api/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
+    url: `/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
     method: 'put',
     data
   })
@@ -80,7 +80,7 @@ export function update${entity.className}(id: number, data: ${entity.className}D
  */
 export function delete${entity.className}(id: number) {
   return request<void>({
-    url: `/api/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
+    url: `/${moduleName}/${entity.apiPath}s/${'$'}{id}`,
     method: 'delete'
   })
 }

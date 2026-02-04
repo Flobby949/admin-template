@@ -34,6 +34,11 @@ public class GeneratorConfig {
     private OptionsConfig options = new OptionsConfig();
 
     /**
+     * 菜单配置
+     */
+    private MenuConfig menu = new MenuConfig();
+
+    /**
      * 全局配置
      */
     @Data

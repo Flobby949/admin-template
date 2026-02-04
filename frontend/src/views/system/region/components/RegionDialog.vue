@@ -1,6 +1,7 @@
 <template>
   <el-dialog
-    v-model="visible"
+    :model-value="visible"
+    @update:model-value="emit('update:visible', $event)"
     :title="isEdit ? '编辑区域表' : '新增区域表'"
     width="600px"
     :close-on-click-modal="false"

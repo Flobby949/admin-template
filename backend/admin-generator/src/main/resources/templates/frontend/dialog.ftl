@@ -1,6 +1,7 @@
 <template>
   <el-dialog
-    v-model="visible"
+    :model-value="visible"
+    @update:model-value="emit('update:visible', $event)"
     :title="isEdit ? '编辑${entity.comment!entity.className}' : '新增${entity.comment!entity.className}'"
     width="600px"
     :close-on-click-modal="false"

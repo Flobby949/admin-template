@@ -33,7 +33,7 @@ public class ModuleInitializer {
      * @return 是否成功
      */
     public boolean initModule(String moduleName) {
-        String moduleDir = "backend/admin-" + moduleName;
+        String moduleDir = "admin-" + moduleName;
         Path modulePath = Paths.get(projectRoot, moduleDir);
         Path pomPath = modulePath.resolve("pom.xml");
 
@@ -74,7 +74,7 @@ public class ModuleInitializer {
         String pomContent = generatePomContent(moduleName);
         try {
             Files.writeString(pomPath, pomContent, StandardCharsets.UTF_8);
-            log.info("创建模块 pom.xml: backend/admin-{}/pom.xml", moduleName);
+            log.info("创建模块 pom.xml: admin-{}/pom.xml", moduleName);
             return true;
         } catch (IOException e) {
             log.error("创建 pom.xml 失败: {}", e.getMessage());
@@ -161,7 +161,7 @@ public class ModuleInitializer {
      * 注册模块到父 pom.xml
      */
     private boolean registerToParentPom(String moduleName) {
-        Path parentPomPath = Paths.get(projectRoot, "backend/pom.xml");
+        Path parentPomPath = Paths.get(projectRoot, "pom.xml");
         if (!Files.exists(parentPomPath)) {
             log.error("父 pom.xml 不存在: {}", parentPomPath);
             return false;

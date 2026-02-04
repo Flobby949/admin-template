@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.flobby.admin.generator.config.EntityConfig;
 import top.flobby.admin.generator.config.GeneratorConfig;
+import top.flobby.admin.generator.config.MenuConfig;
 import top.flobby.admin.generator.writer.CodeWriter;
 
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class CodeGenerator {
     private final TemplateEngine templateEngine;
     private final CodeWriter codeWriter;
     private final GeneratorConfig config;
+    private boolean generateMenu = false;
+    private int entityIndex = 0;
 
     public CodeGenerator(GeneratorConfig config, String projectRoot) {
         this.config = config;
@@ -42,6 +45,7 @@ public class CodeGenerator {
         log.info("包名: {}", config.getGlobal().getPackageName());
         log.info("模块名: {}", config.getGlobal().getModuleName());
 
+        entityIndex = 0;
         for (EntityConfig entity : config.getEntities()) {
             generateEntity(entity);
         }
@@ -67,6 +71,42 @@ public class CodeGenerator {
         if (config.getOptions().getGenerateFrontend()) {
             generateFrontend(entity, dataModel);
         }
+
+        // 生成菜单SQL
+        if (generateMenu || Boolean.TRUE.equals(config.getMenu().getEnabled())) {
+            generateMenuSql(entity, dataModel, entityIndex);
+        }
+
+        entityIndex++;
+    }
+
+    /**
+     * 生成菜单SQL
+     */
+    private void generateMenuSql(EntityConfig entity, Map<String, Object> dataModel, int index) {
+        MenuConfig menu = config.getMenu();
+
+        // 计算菜单ID和按钮ID
+        Integer menuId = menu.getNextMenuId(index);
+        Integer btnBaseId = menu.getNextBtnBaseId(index);
+        Integer menuSort = menu.getNextMenuSort(index);
+
+        if (menuId == null || btnBaseId == null) {
+            log.warn("菜单配置不完整，跳过菜单SQL生成: {}", entity.getClassName());
+            return;
+        }
+
+        // 添加菜单相关数据到模型
+        dataModel.put("menu", menu);
+        dataModel.put("menuId", menuId);
+        dataModel.put("btnBaseId", btnBaseId);
+        dataModel.put("menuSort", menuSort);
+
+        String moduleName = entity.getModuleName();
+        String classNameLower = entity.getClassNameLower();
+
+        generateFile("sql/menu.ftl", dataModel,
+                "admin-" + moduleName + "/src/main/resources/sql/menu_" + classNameLower + ".sql");
     }
 
     /**
@@ -91,8 +131,8 @@ public class CodeGenerator {
         String className = entity.getClassName();
         String packagePath = config.getGlobal().getPackageName().replace(".", "/");
 
-        // 基础路径
-        String basePath = String.format("backend/admin-%s/src/main/java/%s/%s",
+        // 基础路径（不包含 backend/ 前缀，因为 projectRoot 已经指向 backend 目录）
+        String basePath = String.format("admin-%s/src/main/java/%s/%s",
                 moduleName, packagePath, moduleName);
 
         // Entity
@@ -144,17 +184,17 @@ public class CodeGenerator {
         String className = entity.getClassName();
         String classNameLower = entity.getClassNameLower();
 
-        // API
+        // API（相对于 backend 目录，前端在上一级的 frontend 目录）
         generateFile("frontend/api.ftl", dataModel,
-                "frontend/src/api/" + classNameLower + ".ts");
+                "../frontend/src/api/" + classNameLower + ".ts");
 
         // 列表页面
         generateFile("frontend/index.ftl", dataModel,
-                "frontend/src/views/" + moduleName + "/" + classNameLower + "/index.vue");
+                "../frontend/src/views/" + moduleName + "/" + classNameLower + "/index.vue");
 
         // 对话框组件
         generateFile("frontend/dialog.ftl", dataModel,
-                "frontend/src/views/" + moduleName + "/" + classNameLower + "/components/" + className + "Dialog.vue");
+                "../frontend/src/views/" + moduleName + "/" + classNameLower + "/components/" + className + "Dialog.vue");
     }
 
     /**
@@ -181,5 +221,12 @@ public class CodeGenerator {
      */
     public CodeWriter getCodeWriter() {
         return codeWriter;
+    }
+
+    /**
+     * 设置是否生成菜单SQL
+     */
+    public void setGenerateMenu(boolean generateMenu) {
+        this.generateMenu = generateMenu;
     }
 }

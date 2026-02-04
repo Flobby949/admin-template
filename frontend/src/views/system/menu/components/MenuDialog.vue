@@ -51,8 +51,8 @@
         <IconSelect v-model="formData.icon" placeholder="请选择图标" clearable />
       </el-form-item>
 
-      <!-- 菜单类型显示路由路径和组件路径 -->
-      <el-form-item v-if="formData.menuType === 2" label="路由路径" prop="routePath">
+      <!-- 目录和菜单类型显示路由路径 -->
+      <el-form-item v-if="formData.menuType !== 3" label="路由路径" prop="routePath">
         <el-input
           v-model="formData.routePath"
           placeholder="请输入路由路径（如：/system/user）"
@@ -60,6 +60,7 @@
         />
       </el-form-item>
 
+      <!-- 菜单类型显示组件路径 -->
       <el-form-item v-if="formData.menuType === 2" label="组件路径" prop="component">
         <el-input
           v-model="formData.component"
@@ -188,7 +189,7 @@ const formRules = computed<FormRules>(() => ({
   menuType: [{ required: true, message: '请选择菜单类型', trigger: 'change' }],
   routePath: [
     {
-      required: formData.menuType === 2,
+      required: formData.menuType !== 3,
       message: '请输入路由路径',
       trigger: 'blur'
     }
@@ -255,7 +256,6 @@ watch(
       // 切换类型时清空不相关的字段
       if (newType === 1) {
         // 目录类型
-        formData.routePath = ''
         formData.component = ''
         formData.permission = ''
         formData.visible = 1
