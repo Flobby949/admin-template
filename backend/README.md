@@ -2,6 +2,8 @@
 
 基于 Spring Boot 3 + JPA + MySQL + Redis 的后台管理系统后端。
 
+> 💡 **Docker 部署**：推荐使用 Docker 进行一键部署，请参考 [Docker 部署指南](../README-DOCKER.md)
+
 ## 技术栈
 
 - **框架**: Spring Boot 3.5.9

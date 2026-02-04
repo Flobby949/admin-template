@@ -32,7 +32,6 @@ mvnw.cmd
 
 ### Application ###
 *.env
-.env*
 
 ### STS ###
 .apt_generated

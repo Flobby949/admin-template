@@ -1,0 +1,44 @@
+# Maven build artifacts
+**/target/
+**/build/
+
+# IDE files
+**/.idea/
+**/.vscode/
+**/.eclipse/
+**/.settings/
+**/*.iml
+**/*.ipr
+**/*.iws
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker files
+**/Dockerfile
+**/docker-compose*.yml
+**/.dockerignore
+
+# Logs
+**/logs/
+**/*.log
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Test reports
+**/test-output/
+**/coverage/
+
+# Temporary files
+**/*.tmp
+**/*.bak
+**/*.swp
+**/*~
+
+# Documentation (optional, uncomment if you don't need docs in image)
+# **/README.md
+# **/docs/

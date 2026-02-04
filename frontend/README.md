@@ -2,6 +2,8 @@
 
 基于 Vue 3 + TypeScript + Vite + Element Plus 的后台管理系统前端。
 
+> 💡 **Docker 部署**：推荐使用 Docker 进行一键部署，请参考 [Docker 部署指南](../README-DOCKER.md)
+
 ## 技术栈
 
 - **框架**: Vue 3.5 + TypeScript 5.7
