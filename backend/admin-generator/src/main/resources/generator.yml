@@ -1,0 +1,38 @@
+# 代码生成器配置
+# 使用方法:
+#   交互式: java -jar admin-generator.jar i -c generator.yml
+#   命令行: java -jar admin-generator.jar reverse <表名> -c generator.yml -m <模块名> -o ..
+
+# 全局配置（默认值，可在交互式或命令行中覆盖）
+global:
+  # 包名前缀
+  packageName: top.flobby.admin
+  # 默认模块名
+  moduleName: demo
+  # 作者
+  author: Code Generator
+  # 日期格式
+  dateFormat: yyyy-MM-dd
+  # 表前缀（生成类名时会去除，多个用逗号分隔）
+  tablePrefix: sys_,cms_,t_,demo_
+  # 自定义模板目录（可选，不配置则使用默认模板）
+  # templatePath: /path/to/custom/templates
+
+# 数据库配置
+database:
+  url: jdbc:mysql://localhost:3306/db_admin_template?useSSL=false&serverTimezone=Asia/Shanghai
+  username: root
+  password: kobe24
+
+# 生成选项（默认值）
+options:
+  # 是否生成后端代码
+  generateBackend: true
+  # 是否生成前端代码
+  generateFrontend: true
+  # 是否覆盖已存在的文件
+  overwrite: false
+  # 是否生成 Repository 实现类
+  generateRepositoryImpl: true
+  # 是否生成 Query 查询对象
+  generateQuery: true

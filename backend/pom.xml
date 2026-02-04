@@ -18,7 +18,9 @@
         <module>admin-system</module>
         <module>admin-monitor</module>
         <module>admin-cms</module>
+        <module>admin-generator</module>
         <module>admin-boot</module>
+
     </modules>
 
     <properties>
