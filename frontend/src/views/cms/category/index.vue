@@ -158,7 +158,8 @@ const filterTree = (list: CategoryVO[]): CategoryVO[] => {
   return list
     .map(item => {
       const children = item.children ? filterTree(item.children) : []
-      const nameMatch = !queryParams.categoryName || item.categoryName.includes(queryParams.categoryName)
+      const nameMatch =
+        !queryParams.categoryName || item.categoryName.includes(queryParams.categoryName)
       const statusMatch = queryParams.status === undefined || item.status === queryParams.status
 
       if (nameMatch && statusMatch) {

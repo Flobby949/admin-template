@@ -62,9 +62,9 @@ const getTreeselect = async () => {
 }
 
 // Filter Node
-const filterNode = (value: string, data: DeptVO) => {
+const filterNode = (value: string, data: any) => {
   if (!value) return true
-  return data.deptName.includes(value)
+  return data.deptName?.includes(value)
 }
 
 // Handle Node Click

@@ -12,7 +12,7 @@
       :key="item.dictValue"
       :label="item.dictLabel"
       :value="item.dictValue"
-      :disabled="item.status === '0'"
+      :disabled="item.status === 0"
     />
   </el-select>
 </template>

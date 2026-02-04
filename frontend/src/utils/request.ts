@@ -1,4 +1,4 @@
-import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios'
 import { getToken } from '@/utils/auth'
 
 // Create axios instance
@@ -68,4 +68,17 @@ service.interceptors.response.use(
   }
 )
 
-export default service
+// Type-safe request wrapper
+// The interceptor returns res.data, so we need to override the return type
+interface RequestInstance {
+  <T = any>(config: AxiosRequestConfig): Promise<T>
+  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+  head<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+  options<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+}
+
+export default service as RequestInstance

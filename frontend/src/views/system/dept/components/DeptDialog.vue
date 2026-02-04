@@ -75,7 +75,7 @@ const emit = defineEmits<{
   (e: 'success'): void
 }>()
 
-const { modelValue, deptId, parentId } = toRefs(props)
+const { modelValue } = toRefs(props)
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const deptOptions = ref<DeptVO[]>([])

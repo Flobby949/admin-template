@@ -40,14 +40,11 @@ import { QuestionFilled } from '@element-plus/icons-vue'
 
 // Props
 interface Props {
-  modelValue: number
+  modelValue?: number
   deptIds?: number[] // 预留：自定义部门ID列表
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: 3, // 默认值改为"仅本部门"(3)，更安全
-  deptIds: () => []
-})
+defineProps<Props>()
 
 // Emits
 interface Emits {

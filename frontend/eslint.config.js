@@ -75,7 +75,10 @@ export default defineFlatConfig([
       'vue/multi-word-component-names': 'off',
       'vue/no-template-shadow': 'warn',
       // Allow unused vars in Vue emit interface definitions
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_|^e$|^event$|^value$|^error$', varsIgnorePattern: '^_|^props$' }]
+      'no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_|^e$|^event$|^value$|^error$', varsIgnorePattern: '^_|^props$' }
+      ]
     }
   },
   {
@@ -93,7 +96,10 @@ export default defineFlatConfig([
     rules: {
       ...pluginTypeScript.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+      ],
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }]
     }
   },

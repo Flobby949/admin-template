@@ -1,18 +1,13 @@
 <template>
   <el-dialog
     :model-value="visible"
-    @update:model-value="emit('update:visible', $event)"
     :title="isEdit ? '编辑区域表' : '新增区域表'"
     width="600px"
     :close-on-click-modal="false"
+    @update:model-value="emit('update:visible', $event)"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      label-width="100px"
-    >
+    <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
       <el-form-item label="区域名称" prop="name">
         <el-input v-model="formData.name" placeholder="请输入区域名称" />
       </el-form-item>
@@ -79,29 +74,21 @@ const formData = reactive<RegionDTO>({
   parentCode: '',
   level: 0,
   sortOrder: 0,
-  status: 0,
+  status: 0
 })
 
 // 表单验证规则
 const rules: FormRules = {
-  name: [
-    { required: true, message: '请输入区域名称', trigger: 'blur' }
-  ],
-  regionCode: [
-    { required: true, message: '请输入区域编码', trigger: 'blur' }
-  ],
-  level: [
-    { required: true, message: '请输入层级：1-省，2-市，3-区县', trigger: 'blur' }
-  ],
-  status: [
-    { required: true, message: '请输入状态：0-禁用，1-启用', trigger: 'blur' }
-  ],
+  name: [{ required: true, message: '请输入区域名称', trigger: 'blur' }],
+  regionCode: [{ required: true, message: '请输入区域编码', trigger: 'blur' }],
+  level: [{ required: true, message: '请输入层级：1-省，2-市，3-区县', trigger: 'blur' }],
+  status: [{ required: true, message: '请输入状态：0-禁用，1-启用', trigger: 'blur' }]
 }
 
 // 监听 id 变化，加载数据
 watch(
   () => props.id,
-  async (newId) => {
+  async newId => {
     if (newId !== undefined) {
       try {
         const res: any = await getRegion(newId)

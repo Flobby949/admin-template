@@ -12,7 +12,12 @@
         <el-row :gutter="20">
           <el-col :span="16">
             <el-form-item label="文章标题" prop="title">
-              <el-input v-model="form.title" placeholder="请输入文章标题" maxlength="200" show-word-limit />
+              <el-input
+                v-model="form.title"
+                placeholder="请输入文章标题"
+                maxlength="200"
+                show-word-limit
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -82,12 +87,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import type { IDomEditor, IToolbarConfig, IEditorConfig } from '@wangeditor/editor'
 import '@wangeditor/editor/dist/css/style.css'
-import {
-  getArticleById,
-  createArticle,
-  updateArticle,
-  type ArticleForm
-} from '@/api/cms/article'
+import { getArticleById, createArticle, updateArticle, type ArticleForm } from '@/api/cms/article'
 import { getCategoryTree, type CategoryVO } from '@/api/cms/category'
 
 const props = defineProps<{
@@ -102,7 +102,7 @@ const emit = defineEmits<{
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 const isEdit = computed(() => !!props.articleId)
@@ -178,7 +178,7 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
+  await formRef.value.validate(async valid => {
     if (valid) {
       submitting.value = true
       try {
@@ -205,7 +205,7 @@ const handleClose = () => {
   visible.value = false
 }
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     loadCategoryTree()
     if (isEdit.value && props.articleId) {

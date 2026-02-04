@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    v-model="visible"
-    :title="title"
-    width="500px"
-    @close="handleClose"
-  >
+  <el-dialog v-model="visible" :title="title" width="500px" @close="handleClose">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="上级分类">
         <el-tree-select
@@ -64,7 +59,7 @@ const emit = defineEmits<{
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 const formRef = ref<FormInstance>()
@@ -120,7 +115,7 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
+  await formRef.value.validate(async valid => {
     if (valid) {
       submitting.value = true
       try {
@@ -147,7 +142,7 @@ const handleClose = () => {
   visible.value = false
 }
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val) {
     loadCategoryTree()
     if (props.isEdit && props.categoryId) {

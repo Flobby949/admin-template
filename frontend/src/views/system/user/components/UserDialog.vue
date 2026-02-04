@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance } from 'element-plus'
 import { getUserById, createUser, updateUser, type UserDTO } from '@/api/user'
 import { getRoleList, type RoleVO } from '@/api/role'
 import { getDeptTree, type DeptVO } from '@/api/system/dept'
@@ -102,6 +102,14 @@ const form = reactive<UserDTO>({
   deptIds: [], // Keep array if backend supports multiple, but usually user belongs to one main dept.
   remark: ''
 })
+
+// 表单验证规则
+const rules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
+}
+
 // Usually `deptId` (single) is better for primary department.
 // However, UserDTO interface in `src/api/user.ts` has `deptIds?: number[]`.
 // Let's assume for now we select one department but store it in array or handle accordingly.

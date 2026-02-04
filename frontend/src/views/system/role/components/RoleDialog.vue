@@ -76,7 +76,7 @@ const menuTree = ref<MenuTreeVO[]>([])
 const formData = reactive<RoleForm>({
   roleName: '',
   roleCode: '',
-  dataScope: 3, // 默认值改为"仅本部门"(3)，更安全
+  dataScope: 3 as number, // 默认值改为"仅本部门"(3)，更安全
   status: 1,
   remark: '',
   menuIds: []

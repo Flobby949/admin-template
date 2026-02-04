@@ -4,12 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>通知公告</span>
-          <el-button
-            v-permission="'cms:notice:add'"
-            type="primary"
-            icon="Plus"
-            @click="handleAdd"
-          >
+          <el-button v-permission="'cms:notice:add'" type="primary" icon="Plus" @click="handleAdd">
             新增公告
           </el-button>
         </div>
@@ -115,11 +110,7 @@
     </el-card>
 
     <!-- 编辑弹窗 -->
-    <notice-dialog
-      v-model="dialog.visible"
-      :notice-id="dialog.noticeId"
-      @success="handleQuery"
-    />
+    <notice-dialog v-model="dialog.visible" :notice-id="dialog.noticeId" @success="handleQuery" />
   </div>
 </template>
 

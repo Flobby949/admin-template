@@ -8,7 +8,12 @@
   >
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-form-item label="公告标题" prop="title">
-        <el-input v-model="form.title" placeholder="请输入公告标题" maxlength="200" show-word-limit />
+        <el-input
+          v-model="form.title"
+          placeholder="请输入公告标题"
+          maxlength="200"
+          show-word-limit
+        />
       </el-form-item>
 
       <el-form-item label="公告内容" prop="content">
@@ -47,12 +52,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import type { IDomEditor, IToolbarConfig, IEditorConfig } from '@wangeditor/editor'
 import '@wangeditor/editor/dist/css/style.css'
-import {
-  getNoticeById,
-  createNotice,
-  updateNotice,
-  type NoticeForm
-} from '@/api/cms/notice'
+import { getNoticeById, createNotice, updateNotice, type NoticeForm } from '@/api/cms/notice'
 
 const props = defineProps<{
   modelValue: boolean
@@ -66,7 +66,7 @@ const emit = defineEmits<{
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 const isEdit = computed(() => !!props.noticeId)
@@ -125,7 +125,7 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
+  await formRef.value.validate(async valid => {
     if (valid) {
       submitting.value = true
       try {
@@ -152,7 +152,7 @@ const handleClose = () => {
   visible.value = false
 }
 
-watch(visible, (val) => {
+watch(visible, val => {
   if (val && isEdit.value && props.noticeId) {
     loadNoticeDetail(props.noticeId)
   }

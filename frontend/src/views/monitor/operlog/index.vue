@@ -262,7 +262,7 @@ const handleClean = () => {
 const handleExport = async () => {
   try {
     const res = await exportOperLog(queryParams)
-    const blob = new Blob([res], {
+    const blob = new Blob([res as BlobPart], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     })
     const link = document.createElement('a')

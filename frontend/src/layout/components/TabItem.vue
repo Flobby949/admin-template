@@ -8,11 +8,7 @@
       <component :is="tab.icon" />
     </el-icon>
     <span class="tab-title">{{ tab.title }}</span>
-    <el-icon
-      v-if="!tab.fixed"
-      class="tab-close"
-      @click.stop="handleClose"
-    >
+    <el-icon v-if="!tab.fixed" class="tab-close" @click.stop="handleClose">
       <Close />
     </el-icon>
   </div>

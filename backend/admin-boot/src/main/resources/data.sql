@@ -1,3 +1,7 @@
+-- 设置字符集
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 初始管理员账号
 -- 用户名: admin
 -- 密码: admin123

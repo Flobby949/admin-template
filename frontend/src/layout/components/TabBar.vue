@@ -84,7 +84,7 @@ const selectedTab = ref<TabItemType | null>(null)
 const contextMenuPosition = ref({ x: 0, y: 0 })
 
 const contextMenuStyle = computed(() => ({
-  position: 'fixed',
+  position: 'fixed' as const,
   left: `${contextMenuPosition.value.x}px`,
   top: `${contextMenuPosition.value.y}px`,
   zIndex: 9999

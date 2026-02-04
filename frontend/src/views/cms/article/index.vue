@@ -4,12 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>文章管理</span>
-          <el-button
-            v-permission="'cms:article:add'"
-            type="primary"
-            icon="Plus"
-            @click="handleAdd"
-          >
+          <el-button v-permission="'cms:article:add'" type="primary" icon="Plus" @click="handleAdd">
             新增文章
           </el-button>
         </div>

@@ -87,7 +87,7 @@
     </el-card>
 
     <!-- 新增/编辑对话框 -->
-    <RegionDialog v-model:visible="dialogVisible" :id="currentId" @success="handleSuccess" />
+    <RegionDialog :id="currentId" v-model:visible="dialogVisible" @success="handleSuccess" />
   </div>
 </template>
 
@@ -103,7 +103,7 @@ const queryParams = reactive({
   name: undefined as string | undefined,
   regionCode: undefined as string | undefined,
   parentCode: undefined as string | undefined,
-  status: undefined as number | undefined,
+  status: undefined as number | undefined
 })
 
 // 状态

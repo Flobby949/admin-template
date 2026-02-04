@@ -25,7 +25,7 @@
             <div class="stat-label">{{ card.label }}</div>
           </div>
           <div class="stat-trend" :class="card.trend > 0 ? 'up' : 'down'">
-            <el-icon><component :is="card.trend > 0 ? 'Top' : 'Bottom'" /></el-icon>
+            <el-icon><component :is="card.trend > 0 ? Top : Bottom" /></el-icon>
             <span>{{ Math.abs(card.trend) }}%</span>
           </div>
         </div>
@@ -120,9 +120,6 @@ import {
   UserFilled,
   List
 } from '@element-plus/icons-vue'
-
-// Register dynamic components for template usage
-const _dynamicIcons = { Top, Bottom }
 
 // 当前时间
 const currentTime = computed(() => {
