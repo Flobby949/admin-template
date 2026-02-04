@@ -1,6 +1,7 @@
 import router, { add404Route } from './index'
 import { useUserStore } from '@/stores/modules/user'
 import { usePermissionStore } from '@/stores/permission'
+import { useTabsStore } from '@/stores/modules/tabs'
 import { getToken } from '@/utils/auth'
 
 const whiteList = ['/login'] // no redirect whitelist
@@ -76,6 +77,27 @@ router.beforeEach(async (to, _from, next) => {
       next(`/login?redirect=${to.path}`)
     }
   }
+})
+
+// 路由后置守卫：自动同步标签
+router.afterEach(to => {
+  const tabsStore = useTabsStore()
+
+  // 跳过登录页和 redirect 页面
+  if (to.path === '/login' || to.path.startsWith('/redirect')) {
+    return
+  }
+
+  // 自动添加标签（包括隐藏路由）
+  tabsStore.addTab({
+    title: (to.meta?.title as string) || to.name?.toString() || 'Untitled',
+    path: to.path,
+    name: to.name as string,
+    query: to.query,
+    params: to.params,
+    icon: to.meta?.icon as string,
+    keepAlive: to.meta?.keepAlive as boolean
+  })
 })
 
 // 重置动态路由加载状态（用于登出时调用）

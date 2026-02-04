@@ -79,11 +79,17 @@
             </el-dropdown>
           </div>
         </el-header>
+
+        <!-- 标签栏 -->
+        <TabBar v-if="!isMobile" />
+
         <el-main class="main-content">
           <router-view v-slot="{ Component }">
-            <transition name="fade" mode="out-in">
-              <component :is="Component" />
-            </transition>
+            <keep-alive :include="cachedViews">
+              <transition name="fade" mode="out-in">
+                <component :is="Component" />
+              </transition>
+            </keep-alive>
           </router-view>
         </el-main>
       </el-container>
@@ -99,6 +105,7 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
 import { usePermissionStore } from '@/stores/permission'
+import { useTabsStore } from '@/stores/modules/tabs'
 import {
   HomeFilled,
   ElementPlus,
@@ -109,6 +116,7 @@ import {
   Expand
 } from '@element-plus/icons-vue'
 import SidebarItem from './components/SidebarItem.vue'
+import TabBar from './components/TabBar.vue'
 import ThemeToggle from '@/components/ThemeToggle/index.vue'
 import ThemeSettings from '@/components/ThemeSettings/index.vue'
 import ChangePassword from '@/components/ChangePassword/index.vue'
@@ -117,6 +125,7 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 const permissionStore = usePermissionStore()
+const tabsStore = useTabsStore()
 
 // 响应式状态
 const isCollapsed = ref(false)
@@ -137,6 +146,7 @@ const sidebarWidth = computed(() => {
 
 const activeMenu = computed(() => route.path)
 const currentRouteName = computed(() => route.meta?.title || 'Dashboard')
+const cachedViews = computed(() => tabsStore.cachedViews)
 
 // 获取动态菜单路由（过滤掉隐藏的）
 const menuRoutes = computed(() => {
@@ -159,6 +169,8 @@ const handleResize = () => {
 
 const handleLogout = async () => {
   await userStore.logout()
+  // 清理标签状态
+  localStorage.removeItem('tabs-state')
   router.push('/login')
 }
 
