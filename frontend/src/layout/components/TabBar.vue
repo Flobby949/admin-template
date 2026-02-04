@@ -15,45 +15,52 @@
     </el-scrollbar>
 
     <!-- 右键菜单 -->
-    <el-dropdown
-      v-if="contextMenuVisible"
-      :style="contextMenuStyle"
-      trigger="contextmenu"
-      @command="handleMenuCommand"
-    >
-      <span />
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="refresh">
+    <Teleport to="body">
+      <div
+        v-if="contextMenuVisible"
+        :style="contextMenuStyle"
+        class="tab-context-menu"
+      >
+        <ul class="context-menu-list">
+          <li class="context-menu-item" @click="handleMenuCommand('refresh')">
             <el-icon><Refresh /></el-icon>
-            刷新
-          </el-dropdown-item>
-          <el-dropdown-item
-            command="close-current"
-            :disabled="selectedTab?.fixed"
+            <span>刷新</span>
+          </li>
+          <li
+            class="context-menu-item"
+            :class="{ disabled: selectedTab?.fixed }"
+            @click="!selectedTab?.fixed && handleMenuCommand('close-current')"
           >
             <el-icon><Close /></el-icon>
-            关闭当前
-          </el-dropdown-item>
-          <el-dropdown-item command="close-other">
+            <span>关闭当前</span>
+          </li>
+          <li class="context-menu-item" @click="handleMenuCommand('close-other')">
             <el-icon><CircleClose /></el-icon>
-            关闭其他
-          </el-dropdown-item>
-          <el-dropdown-item command="close-left" :disabled="isLeftmost">
+            <span>关闭其他</span>
+          </li>
+          <li
+            class="context-menu-item"
+            :class="{ disabled: isLeftmost }"
+            @click="!isLeftmost && handleMenuCommand('close-left')"
+          >
             <el-icon><Back /></el-icon>
-            关闭左侧
-          </el-dropdown-item>
-          <el-dropdown-item command="close-right" :disabled="isRightmost">
+            <span>关闭左侧</span>
+          </li>
+          <li
+            class="context-menu-item"
+            :class="{ disabled: isRightmost }"
+            @click="!isRightmost && handleMenuCommand('close-right')"
+          >
             <el-icon><Right /></el-icon>
-            关闭右侧
-          </el-dropdown-item>
-          <el-dropdown-item command="close-all">
+            <span>关闭右侧</span>
+          </li>
+          <li class="context-menu-item" @click="handleMenuCommand('close-all')">
             <el-icon><Delete /></el-icon>
-            关闭所有
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
+            <span>关闭所有</span>
+          </li>
+        </ul>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -208,5 +215,55 @@ watch(activeTab, () => {
   height: 100%;
   padding: 0 10px;
   white-space: nowrap;
+}
+
+/* 右键菜单样式 */
+.tab-context-menu {
+  position: fixed;
+  z-index: 9999;
+  /* 修复 1: 使用项目定义的卡片背景变量，确保黑白主题都有背景 */
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card); /* 使用项目定义的阴影 */
+  padding: 6px 0; /* 稍微增加上下内边距 */
+  min-width: 140px;
+
+  .context-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .context-menu-item {
+    display: flex;
+    align-items: center;
+    /* 修复 2: 增加内边距，扩大点击区域，解决间隔太小问题 */
+    padding: 10px 20px;
+    margin: 0;
+    font-size: 14px;
+    /* 使用项目通用文字颜色变量 */
+    color: var(--text-regular);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    .el-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    &:hover:not(.disabled) {
+      /* 使用项目定义的悬停背景色 */
+      background-color: var(--bg-hover);
+      /* 使用主色调变量 */
+      color: var(--primary-color);
+    }
+
+    &.disabled {
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
 }
 </style>
