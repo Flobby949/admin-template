@@ -26,4 +26,9 @@ app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
 
+// Initialize tabs store after pinia is installed
+import { useTabsStore } from './stores/modules/tabs'
+const tabsStore = useTabsStore()
+tabsStore.restoreState()
+
 app.mount('#app')
