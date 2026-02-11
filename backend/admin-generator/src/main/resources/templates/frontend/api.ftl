@@ -20,7 +20,6 @@ export interface ${entity.className}DTO {
 </#list>
 }
 
-<#if entity.hasQueryFields()>
 export interface ${entity.className}Query {
 <#list entity.queryFields as field>
   /** ${field.comment!field.fieldName} */
@@ -32,14 +31,27 @@ export interface ${entity.className}Query {
   pageSize?: number
 }
 
-</#if>
+export interface PageResult<T> {
+  /** 数据列表 */
+  list: T[]
+  /** 总记录数 */
+  total: number
+  /** 当前页码 */
+  current: number
+  /** 每页大小 */
+  size: number
+  /** 总页数 */
+  pages: number
+}
+
 /**
- * 获取${entity.comment!entity.className}列表
+ * 分页查询${entity.comment!entity.className}列表
  */
-export function list${entity.className}s() {
-  return request<${entity.className}VO[]>({
-    url: '/${moduleName}/${entity.apiPath}s',
-    method: 'get'
+export function list${entity.className}s(query: ${entity.className}Query) {
+  return request<PageResult<${entity.className}VO>>({
+    url: '/${moduleName}/${entity.apiPath}s/list',
+    method: 'post',
+    data: query
   })
 }
 

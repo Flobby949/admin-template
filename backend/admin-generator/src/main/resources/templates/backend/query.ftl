@@ -5,6 +5,8 @@ import ${import};
 </#list>
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ${packageName}.common.core.PageQuery;
 
 /**
  * ${entity.comment!entity.className}查询条件
@@ -13,8 +15,9 @@ import lombok.Data;
  * @date ${date}
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "${entity.comment!entity.className}查询条件")
-public class ${entity.className}Query {
+public class ${entity.className}Query extends PageQuery {
 
 <#list entity.queryFields as field>
     /**
@@ -24,15 +27,4 @@ public class ${entity.className}Query {
     private ${field.fieldType} ${field.fieldName};
 
 </#list>
-    /**
-     * 页码
-     */
-    @Schema(description = "页码", defaultValue = "1")
-    private Integer pageNum = 1;
-
-    /**
-     * 每页数量
-     */
-    @Schema(description = "每页数量", defaultValue = "10")
-    private Integer pageSize = 10;
 }

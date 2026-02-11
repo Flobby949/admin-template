@@ -88,6 +88,19 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页 -->
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="queryParams.pageNum"
+          v-model:page-size="queryParams.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleQuery"
+          @current-change="handleQuery"
+        />
+      </div>
     </el-card>
 
     <!-- 新增/编辑对话框 -->
@@ -107,11 +120,14 @@ const queryParams = reactive({
 <#list entity.queryFields as field>
   ${field.fieldName}: undefined as <#if field.fieldType == "Long" || field.fieldType == "Integer">number<#elseif field.fieldType == "Boolean">boolean<#else>string</#if> | undefined,
 </#list>
+  pageNum: 1,
+  pageSize: 10
 })
 
 // 状态
 const loading = ref(false)
 const dataList = ref<${entity.className}VO[]>([])
+const total = ref(0)
 const dialogVisible = ref(false)
 const currentId = ref<number | undefined>(undefined)
 
@@ -119,8 +135,9 @@ const currentId = ref<number | undefined>(undefined)
 const fetchList = async () => {
   loading.value = true
   try {
-    const res: any = await list${entity.className}s()
-    dataList.value = res || []
+    const res: any = await list${entity.className}s(queryParams)
+    dataList.value = res?.list || []
+    total.value = res?.total || 0
   } catch (error) {
     console.error('Failed to fetch list:', error)
   } finally {
@@ -130,6 +147,7 @@ const fetchList = async () => {
 
 // 搜索
 const handleQuery = () => {
+  queryParams.pageNum = 1
   fetchList()
 }
 
@@ -138,6 +156,7 @@ const resetQuery = () => {
 <#list entity.queryFields as field>
   queryParams.${field.fieldName} = undefined
 </#list>
+  queryParams.pageNum = 1
   fetchList()
 }
 
@@ -200,5 +219,11 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 </style>

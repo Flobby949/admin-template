@@ -2,13 +2,16 @@ package top.flobby.admin.monitor.interfaces.query;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import top.flobby.admin.common.core.PageQuery;
 
 /**
  * 操作日志查询条件
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Schema(description = "操作日志查询条件")
-public class OperationLogQuery {
+public class OperationLogQuery extends PageQuery {
 
     @Schema(description = "操作模块")
     private String title;
@@ -27,10 +30,4 @@ public class OperationLogQuery {
 
     @Schema(description = "结束时间")
     private String endTime;
-
-    @Schema(description = "页码", example = "1")
-    private Integer pageNum = 1;
-
-    @Schema(description = "每页大小", example = "10")
-    private Integer pageSize = 10;
 }

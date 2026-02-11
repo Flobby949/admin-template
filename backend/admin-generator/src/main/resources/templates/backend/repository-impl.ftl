@@ -3,6 +3,9 @@ package ${packageName}.${moduleName}.infrastructure.repository;
 import ${packageName}.${moduleName}.domain.entity.${entity.className};
 import ${packageName}.${moduleName}.domain.repository.${entity.className}Repository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,6 +31,13 @@ public class ${entity.className}RepositoryImpl implements ${entity.className}Rep
     @Override
     public List<${entity.className}> findAll() {
         return jpaRepository.findByDeleted(0);
+    }
+
+    @Override
+    public Page<${entity.className}> findAll(Specification<${entity.className}> spec, Pageable pageable) {
+        Specification<${entity.className}> notDeleted = (root, query, cb) -> cb.equal(root.get("deleted"), 0);
+        Specification<${entity.className}> combined = spec == null ? notDeleted : spec.and(notDeleted);
+        return jpaRepository.findAll(combined, pageable);
     }
 
     @Override

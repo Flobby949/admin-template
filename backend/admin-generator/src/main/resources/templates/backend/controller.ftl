@@ -7,12 +7,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ${packageName}.common.annotation.RequiresPermission;
+import ${packageName}.common.core.PageResult;
 import ${packageName}.common.core.Result;
 import ${packageName}.${moduleName}.application.${entity.className}Service;
 import ${packageName}.${moduleName}.interfaces.dto.${entity.className}DTO;
+import ${packageName}.${moduleName}.interfaces.query.${entity.className}Query;
 import ${packageName}.${moduleName}.interfaces.vo.${entity.className}VO;
-
-import java.util.List;
 
 /**
  * ${entity.comment!entity.className}管理控制器
@@ -28,12 +28,12 @@ public class ${entity.className}Controller {
 
     private final ${entity.className}Service ${entity.classNameLower}Service;
 
-    @Operation(summary = "获取${entity.comment!entity.className}列表")
-    @GetMapping
+    @Operation(summary = "分页查询${entity.comment!entity.className}列表")
+    @PostMapping("/list")
     @RequiresPermission("${entity.permissionPrefix}:list")
-    public Result<List<${entity.className}VO>> list() {
-        List<${entity.className}VO> list = ${entity.classNameLower}Service.list();
-        return Result.success(list);
+    public Result<PageResult<${entity.className}VO>> list(@RequestBody ${entity.className}Query query) {
+        PageResult<${entity.className}VO> result = ${entity.classNameLower}Service.list(query);
+        return Result.success(result);
     }
 
     @Operation(summary = "获取${entity.comment!entity.className}详情")

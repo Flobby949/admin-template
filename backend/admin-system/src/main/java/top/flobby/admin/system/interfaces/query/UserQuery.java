@@ -1,6 +1,8 @@
 package top.flobby.admin.system.interfaces.query;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import top.flobby.admin.common.core.PageQuery;
 
 /**
  * 用户查询条件
@@ -9,7 +11,8 @@ import lombok.Data;
  * @date 2026-01-26
  */
 @Data
-public class UserQuery {
+@EqualsAndHashCode(callSuper = true)
+public class UserQuery extends PageQuery {
 
     /**
      * 用户名（模糊查询）
@@ -50,14 +53,4 @@ public class UserQuery {
      * 结束时间（创建时间范围查询）
      */
     private String endTime;
-
-    /**
-     * 页码
-     */
-    private Integer pageNum = 1;
-
-    /**
-     * 每页大小
-     */
-    private Integer pageSize = 10;
 }

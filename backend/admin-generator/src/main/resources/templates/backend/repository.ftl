@@ -1,6 +1,9 @@
 package ${packageName}.${moduleName}.domain.repository;
 
 import ${packageName}.${moduleName}.domain.entity.${entity.className};
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,15 @@ public interface ${entity.className}Repository {
      * @return 实体列表
      */
     List<${entity.className}> findAll();
+
+    /**
+     * 分页条件查询
+     *
+     * @param spec     查询条件
+     * @param pageable 分页参数
+     * @return 分页结果
+     */
+    Page<${entity.className}> findAll(Specification<${entity.className}> spec, Pageable pageable);
 
     /**
      * 保存实体

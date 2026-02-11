@@ -6,16 +6,23 @@ import ${import};
 import ${packageName}.${moduleName}.domain.entity.${entity.className};
 import ${packageName}.${moduleName}.domain.repository.${entity.className}Repository;
 import ${packageName}.${moduleName}.interfaces.dto.${entity.className}DTO;
-import ${packageName}.${moduleName}.interfaces.vo.${entity.className}VO;
-<#if entity.hasQueryFields()>
 import ${packageName}.${moduleName}.interfaces.query.${entity.className}Query;
-</#if>
+import ${packageName}.${moduleName}.interfaces.vo.${entity.className}VO;
+import ${packageName}.common.core.PageResult;
 import ${packageName}.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,15 +40,27 @@ public class ${entity.className}Service {
     private final ${entity.className}Repository ${entity.classNameLower}Repository;
 
     /**
-     * 查询${entity.comment!entity.className}列表
+     * 分页查询${entity.comment!entity.className}列表
      *
-     * @return ${entity.comment!entity.className}列表
+     * @param query 查询条件
+     * @return 分页结果
      */
-    public List<${entity.className}VO> list() {
-        List<${entity.className}> list = ${entity.classNameLower}Repository.findAll();
-        return list.stream()
+    public PageResult<${entity.className}VO> list(${entity.className}Query query) {
+        Pageable pageable = PageRequest.of(
+                query.getPageNum() - 1,
+                query.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createTime")
+        );
+
+        Specification<${entity.className}> spec = buildSpecification(query);
+        Page<${entity.className}> page = ${entity.classNameLower}Repository.findAll(spec, pageable);
+
+        List<${entity.className}VO> list = page.getContent().stream()
                 .map(this::toVO)
                 .collect(Collectors.toList());
+
+        return new PageResult<>(list, page.getTotalElements(),
+                (long) query.getPageNum(), (long) query.getPageSize());
     }
 
     /**
@@ -98,6 +117,29 @@ public class ${entity.className}Service {
         entity.setDeleted(1);
         ${entity.classNameLower}Repository.save(entity);
         log.info("删除${entity.comment!entity.className}成功: id={}", id);
+    }
+
+    /**
+     * 构建查询条件
+     */
+    private Specification<${entity.className}> buildSpecification(${entity.className}Query query) {
+        return (root, criteriaQuery, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+<#list entity.queryFields as field>
+<#if field.fieldType == "String">
+            if (StringUtils.hasText(query.get${field.fieldNameCapitalized}())) {
+                predicates.add(cb.like(root.get("${field.fieldName}"), "%" + query.get${field.fieldNameCapitalized}() + "%"));
+            }
+<#else>
+            if (query.get${field.fieldNameCapitalized}() != null) {
+                predicates.add(cb.equal(root.get("${field.fieldName}"), query.get${field.fieldNameCapitalized}()));
+            }
+</#if>
+</#list>
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     /**
