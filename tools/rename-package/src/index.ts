@@ -17,6 +17,7 @@ import type { ChangeReport, FileChange, Warning, Stats } from './types.js';
 function parseArgs(argv: string[]): {
   oldPackage: string;
   newPackage: string;
+  groupId: string;
   dryRun: boolean;
   yes: boolean;
   verify: boolean;
@@ -24,6 +25,7 @@ function parseArgs(argv: string[]): {
 } {
   const args = argv.slice(2);
   const flags = {
+    groupId: '',
     dryRun: false,
     yes: false,
     verify: false,
@@ -31,7 +33,8 @@ function parseArgs(argv: string[]): {
   };
   const positional: string[] = [];
 
-  for (const arg of args) {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
     switch (arg) {
       case '--dry-run':
         flags.dryRun = true;
@@ -41,6 +44,9 @@ function parseArgs(argv: string[]): {
         break;
       case '--verify':
         flags.verify = true;
+        break;
+      case '--group-id':
+        flags.groupId = args[++i] || '';
         break;
       case '--help':
       case '-h':
@@ -167,6 +173,11 @@ async function main(): Promise<void> {
   let verify = parsed.verify;
   let yes = parsed.yes;
   let groupIdOverrides: { oldGroupId?: string; newGroupId?: string } | undefined;
+
+  // CLI mode: --group-id overrides newGroupId
+  if (parsed.groupId) {
+    groupIdOverrides = { newGroupId: parsed.groupId };
+  }
 
   // No positional args → interactive mode
   if (!oldPackage && !newPackage) {
@@ -325,10 +336,11 @@ function printHelp(): void {
   console.log('  old-package  Current package name (e.g., top.flobby.admin)');
   console.log('  new-package  Target package name (e.g., com.example.demo)');
   console.log('\nOptions:');
-  console.log('  --dry-run    Preview changes without modifying files');
-  console.log('  --yes        Skip confirmation, execute directly');
-  console.log('  --verify     Run mvnd compile after execution');
-  console.log('  --help, -h   Show this help message');
+  console.log('  --dry-run          Preview changes without modifying files');
+  console.log('  --yes              Skip confirmation, execute directly');
+  console.log('  --verify           Run mvnd compile after execution');
+  console.log('  --group-id <id>    Override new groupId (default: derived from new-package)');
+  console.log('  --help, -h         Show this help message');
   console.log('\nExit codes:');
   console.log('  0  Success (including dry-run and cancel)');
   console.log('  1  Argument error');

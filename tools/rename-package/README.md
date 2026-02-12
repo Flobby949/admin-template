@@ -38,13 +38,19 @@ npx tsx tools/rename-package/src/index.ts
 Package Rename Tool — Interactive Mode
 
 Old package name: top.flobby.admin
-New package name: com.example.demo
+New package name: com.lavaclone
+
+GroupId mapping (derived): top.flobby -> com
+Old groupId [top.flobby]:              ← 回车接受默认值
+New groupId [com]: com.lavaclone       ← 输入覆盖
+
 Preview only (dry-run)? [y/N] n
 Verify compile after execution? [y/N] y
 ```
 
 - 包名格式不合法时会提示错误并重新要求输入（不限次数）
 - 新旧包名相同时会要求重新输入新包名
+- groupId 默认由包名自动推导（去掉最后一段），直接回车接受；如不符合预期可手动输入覆盖
 - 收集完成后自动进入预览 → 执行流程（无需再次确认）
 
 ### 命令行模式（带参数启动）
@@ -71,6 +77,7 @@ npx tsx tools/rename-package/src/index.ts <old-package> <new-package> [options]
 | `--dry-run` | 仅预览变更，不修改任何文件 |
 | `--yes` | 跳过确认提示，直接执行 |
 | `--verify` | 执行后自动运行 `mvnd compile` 验证编译 |
+| `--group-id <id>` | 覆盖新 groupId（默认由包名自动推导） |
 | `--help` | 显示帮助信息 |
 
 ### 退出码
@@ -169,14 +176,28 @@ npx tsx tools/rename-package/src/index.ts top.flobby.admin com.example.demo --ye
 - **字符串常量检测**：Java 文件中字符串字面量里的旧包名会被标记为 Warning，不自动替换
 - **非空目录保留**：目录迁移后如旧目录仍有非 Java 文件（如 `.gitkeep`），保留并提示
 
-## groupId 推导规则
+## groupId 推导与覆盖
 
-包名去掉最后一段作为 groupId：
+默认规则：包名去掉最后一段作为 groupId：
 
 ```
 top.flobby.admin → groupId: top.flobby
 com.example.demo → groupId: com.example
-com.example      → groupId: com
+com.lavaclone    → groupId: com          ← 两段包名推导结果可能不符合预期
+```
+
+**交互式模式**下，工具会展示推导结果并让你确认，直接回车接受默认值，或输入新值覆盖：
+
+```
+GroupId mapping (derived): top.flobby -> com
+Old groupId [top.flobby]:              ← 回车接受
+New groupId [com]: com.lavaclone       ← 手动覆盖为 com.lavaclone
+```
+
+**命令行模式**下默认使用自动推导值，可通过 `--group-id` 覆盖：
+
+```bash
+npx tsx tools/rename-package/src/index.ts top.flobby.admin com.lavaclone --group-id com.lavaclone --yes
 ```
 
 ## 开发与测试

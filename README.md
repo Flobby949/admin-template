@@ -6,6 +6,7 @@
 - Docker 部署：[README-DOCKER.md](README-DOCKER.md)
 - 后端说明：[backend/README.md](backend/README.md)
 - 前端说明：[frontend/README.md](frontend/README.md)
+- 包名重命名工具：[tools/rename-package/README.md](tools/rename-package/README.md)
 
 **技术栈**
 - 后端：Java 21、Spring Boot 3.5.9、Spring Data JPA、MySQL 8、Redis 7、JWT、SpringDoc OpenAPI
@@ -15,6 +16,7 @@
 **目录结构**
 - `backend/` 后端多模块工程（Spring Boot）
 - `frontend/` 前端工程（Vue 3 + Vite）
+- `tools/rename-package/` 包名重命名工具（Node.js CLI）
 - [README-DOCKER.md](README-DOCKER.md) Docker 部署指南
 
 **快速开始（Docker 推荐）**
@@ -57,6 +59,26 @@ mysql -u root -p admin_system < backend/admin-boot/src/main/resources/data.sql
 - Docker 环境变量：`.env`（参考 `.env.example`）
 - 前端环境变量：`frontend/.env.local`
 - 后端开发配置：`backend/admin-boot/src/main/resources/application-dev.yml`
+
+**包名重命名工具**
+
+基于模板创建新项目后，用此工具一键替换包名（Java package/import、pom.xml groupId、配置文件引用、目录结构）：
+
+```bash
+# 安装依赖（首次）
+cd tools/rename-package && npm install && cd ../..
+
+# 交互式（推荐）— 逐步提示输入，支持确认/覆盖 groupId
+npx tsx tools/rename-package/src/index.ts
+
+# 命令行 — 直接指定参数执行
+npx tsx tools/rename-package/src/index.ts top.flobby.admin com.example.demo --yes --verify
+
+# 命令行 — 自定义 groupId（两段包名时推导值可能不对）
+npx tsx tools/rename-package/src/index.ts top.flobby.admin com.lavaclone --group-id com.lavaclone --yes
+```
+
+详见 [tools/rename-package/README.md](tools/rename-package/README.md)
 
 **许可证**
 MIT
