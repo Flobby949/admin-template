@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { Interface as ReadlineInterface } from 'node:readline';
-import { promptPackageName, promptYesNo, runInteractiveMode } from '../src/prompt.js';
+import { promptPackageName, promptYesNo, promptGroupId, runInteractiveMode } from '../src/prompt.js';
 import type { CreateRL } from '../src/prompt.js';
 
 /**
@@ -97,44 +97,67 @@ describe('promptYesNo', () => {
   });
 });
 
+describe('promptGroupId', () => {
+  it('should return default value when input is empty', async () => {
+    const createRL = createMockRL(['']);
+    const result = await promptGroupId('New groupId', 'com.example', createRL);
+    expect(result).toBe('com.example');
+  });
+
+  it('should return user input when provided', async () => {
+    const createRL = createMockRL(['com.lavaclone']);
+    const result = await promptGroupId('New groupId', 'com', createRL);
+    expect(result).toBe('com.lavaclone');
+  });
+});
+
 describe('runInteractiveMode', () => {
-  it('should collect oldPackage, newPackage, dryRun, verify and return config', async () => {
-    // Sequence: oldPackage, newPackage, dryRun(n), verify(n)
-    const createRL = createMockRL(['top.flobby.admin', 'com.example.demo', 'n', 'n']);
+  // Sequence: oldPackage, newPackage, oldGroupId, newGroupId, dryRun, verify
+
+  it('should collect all fields and accept default groupIds', async () => {
+    // Enter to accept derived groupIds
+    const createRL = createMockRL(['top.flobby.admin', 'com.example.demo', '', '', 'n', 'n']);
     const config = await runInteractiveMode(createRL);
     expect(config.oldPackage).toBe('top.flobby.admin');
     expect(config.newPackage).toBe('com.example.demo');
+    expect(config.oldGroupId).toBe('top.flobby');
+    expect(config.newGroupId).toBe('com.example');
     expect(config.dryRun).toBe(false);
     expect(config.verify).toBe(false);
   });
 
-  it('should set dryRun and verify to true when user answers yes', async () => {
-    const createRL = createMockRL(['com.old.pkg', 'com.new.pkg', 'y', 'y']);
+  it('should allow overriding groupIds', async () => {
+    const createRL = createMockRL(['top.flobby.admin', 'com.lavaclone', 'top.flobby', 'com.lavaclone', 'n', 'n']);
     const config = await runInteractiveMode(createRL);
-    expect(config.oldPackage).toBe('com.old.pkg');
-    expect(config.newPackage).toBe('com.new.pkg');
+    expect(config.oldPackage).toBe('top.flobby.admin');
+    expect(config.newPackage).toBe('com.lavaclone');
+    expect(config.oldGroupId).toBe('top.flobby');
+    expect(config.newGroupId).toBe('com.lavaclone');
+  });
+
+  it('should set dryRun and verify to true when user answers yes', async () => {
+    const createRL = createMockRL(['com.old.pkg', 'com.new.pkg', '', '', 'y', 'y']);
+    const config = await runInteractiveMode(createRL);
     expect(config.dryRun).toBe(true);
     expect(config.verify).toBe(true);
   });
 
   it('should retry when old and new package names are the same', async () => {
-    // old=com.example.app, new=com.example.app (same, retry), then valid new
-    const createRL = createMockRL(['com.example.app', 'com.example.app', 'com.example.demo', 'n', 'n']);
+    const createRL = createMockRL(['com.example.app', 'com.example.app', 'com.example.demo', '', '', 'n', 'n']);
     const config = await runInteractiveMode(createRL);
     expect(config.oldPackage).toBe('com.example.app');
     expect(config.newPackage).toBe('com.example.demo');
   });
 
   it('should retry on invalid package name format in interactive flow', async () => {
-    // old: invalid first, then valid. new: valid first try
-    const createRL = createMockRL(['BAD', 'com.valid.old', 'com.valid.new', '', '']);
+    const createRL = createMockRL(['BAD', 'com.valid.old', 'com.valid.new', '', '', '', '']);
     const config = await runInteractiveMode(createRL);
     expect(config.oldPackage).toBe('com.valid.old');
     expect(config.newPackage).toBe('com.valid.new');
   });
 
   it('should use default values for dryRun (no) and verify (no) on empty input', async () => {
-    const createRL = createMockRL(['com.old.pkg', 'com.new.pkg', '', '']);
+    const createRL = createMockRL(['com.old.pkg', 'com.new.pkg', '', '', '', '']);
     const config = await runInteractiveMode(createRL);
     expect(config.dryRun).toBe(false);
     expect(config.verify).toBe(false);

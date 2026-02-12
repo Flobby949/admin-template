@@ -27,7 +27,7 @@ function validatePackageName(name: string, label: string): string | undefined {
  * 从包名推导 groupId（去掉最后一段）
  * top.flobby.admin → top.flobby
  */
-function deriveGroupId(packageName: string): string {
+export function deriveGroupId(packageName: string): string {
   const parts = packageName.split('.');
   return parts.slice(0, -1).join('.');
 }
@@ -42,8 +42,13 @@ function packageToPath(packageName: string): string {
 
 /**
  * 验证输入并创建 PackageMapping
+ * 可选传入自定义 groupId 覆盖自动推导值
  */
-export function validateAndCreateMapping(oldPackage: string, newPackage: string): ValidationResult {
+export function validateAndCreateMapping(
+  oldPackage: string,
+  newPackage: string,
+  overrides?: { oldGroupId?: string; newGroupId?: string },
+): ValidationResult {
   const oldError = validatePackageName(oldPackage, 'Old package name');
   if (oldError) {
     return { error: oldError };
@@ -62,8 +67,8 @@ export function validateAndCreateMapping(oldPackage: string, newPackage: string)
     mapping: {
       oldPackage,
       newPackage,
-      oldGroupId: deriveGroupId(oldPackage),
-      newGroupId: deriveGroupId(newPackage),
+      oldGroupId: overrides?.oldGroupId || deriveGroupId(oldPackage),
+      newGroupId: overrides?.newGroupId || deriveGroupId(newPackage),
       oldPath: packageToPath(oldPackage),
       newPath: packageToPath(newPackage),
     },

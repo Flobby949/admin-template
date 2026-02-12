@@ -1,5 +1,5 @@
 import * as readline from 'node:readline';
-import { validateAndCreateMapping } from './validator.js';
+import { validateAndCreateMapping, deriveGroupId } from './validator.js';
 
 export type CreateRL = () => readline.Interface;
 
@@ -65,9 +65,27 @@ export async function promptYesNo(question: string, defaultYes: boolean, createR
   return normalized === 'y' || normalized === 'yes';
 }
 
+/**
+ * Prompt the user to confirm or override a groupId.
+ * Shows the derived default; user can press Enter to accept or type a new value.
+ */
+export async function promptGroupId(label: string, defaultValue: string, createRL: CreateRL = defaultCreateRL): Promise<string> {
+  const rl = createRL();
+  const answer = await ask(rl, `${label} [${defaultValue}]: `);
+  rl.close();
+
+  if (!answer) {
+    return defaultValue;
+  }
+
+  return answer;
+}
+
 export interface InteractiveConfig {
   oldPackage: string;
   newPackage: string;
+  oldGroupId: string;
+  newGroupId: string;
   dryRun: boolean;
   verify: boolean;
 }
@@ -97,11 +115,18 @@ export async function runInteractiveMode(createRL: CreateRL = defaultCreateRL): 
     break;
   }
 
-  // Step 4: Dry-run?
+  // Step 4: Confirm groupId mapping
+  const derivedOldGroupId = deriveGroupId(oldPackage);
+  const derivedNewGroupId = deriveGroupId(newPackage);
+  console.log(`\nGroupId mapping (derived): ${derivedOldGroupId} -> ${derivedNewGroupId}`);
+  const oldGroupId = await promptGroupId('Old groupId', derivedOldGroupId, createRL);
+  const newGroupId = await promptGroupId('New groupId', derivedNewGroupId, createRL);
+
+  // Step 5: Dry-run?
   const dryRun = await promptYesNo('Preview only (dry-run)?', false, createRL);
 
-  // Step 5: Verify compile?
+  // Step 6: Verify compile?
   const verify = await promptYesNo('Verify compile after execution?', false, createRL);
 
-  return { oldPackage, newPackage, dryRun, verify };
+  return { oldPackage, newPackage, oldGroupId, newGroupId, dryRun, verify };
 }

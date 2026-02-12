@@ -166,12 +166,14 @@ async function main(): Promise<void> {
   let dryRun = parsed.dryRun;
   let verify = parsed.verify;
   let yes = parsed.yes;
+  let groupIdOverrides: { oldGroupId?: string; newGroupId?: string } | undefined;
 
   // No positional args → interactive mode
   if (!oldPackage && !newPackage) {
     const config = await runInteractiveMode();
     oldPackage = config.oldPackage;
     newPackage = config.newPackage;
+    groupIdOverrides = { oldGroupId: config.oldGroupId, newGroupId: config.newGroupId };
     dryRun = dryRun || config.dryRun;
     verify = verify || config.verify;
     // Interactive mode already confirmed input, skip confirm prompt
@@ -186,7 +188,7 @@ async function main(): Promise<void> {
   }
 
   // 验证包名
-  const validation = validateAndCreateMapping(oldPackage, newPackage);
+  const validation = validateAndCreateMapping(oldPackage, newPackage, groupIdOverrides);
   if (validation.error) {
     console.error(`Error: ${validation.error}\n`);
     printUsage();
